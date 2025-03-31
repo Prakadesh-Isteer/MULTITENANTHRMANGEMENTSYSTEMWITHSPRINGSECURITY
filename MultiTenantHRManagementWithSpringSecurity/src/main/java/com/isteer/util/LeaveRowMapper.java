@@ -8,25 +8,44 @@ import org.springframework.jdbc.core.RowMapper;
 import com.isteer.dto.LeaveResponseDto;
 import com.isteer.entity.LeaveManagement;
 
-public class LeaveRowMapper implements RowMapper<LeaveManagement> {
+//public class LeaveRowMapper implements RowMapper<LeaveManagement> {
+//
+//	@Override
+//	public LeaveManagement mapRow(ResultSet rs, int rowNum) throws SQLException {
+//		LeaveManagement leave = new LeaveManagement();
+//        leave.setLeaveUuid(rs.getString("leave_uuid"));
+//        leave.setEmployeeUuid(rs.getString("employee_id"));
+//        leave.setDepartmentUuid(rs.getString("department_id"));
+//        leave.setStartDate(rs.getDate("start_date"));
+//        leave.setEndDate(rs.getDate("end_date"));
+//        leave.setReason(rs.getString("reason"));
+//        leave.setStatus(rs.getString("status"));
+//        leave.setAppliedAt(rs.getTimestamp("applied_at"));
+//        leave.setApprovedBy(rs.getString("approved_or_rejected_by"));
+//        leave.setApprovedAt(rs.getTimestamp("approved_or_rejected_at"));
+//        return leave;
+//	}
 
-	@Override
-	public LeaveManagement mapRow(ResultSet rs, int rowNum) throws SQLException {
-		LeaveManagement leave = new LeaveManagement();
+
+public class LeaveRowMapper implements RowMapper<LeaveManagement> {
+    @Override
+    public LeaveManagement mapRow(ResultSet rs, int rowNum) throws SQLException {
+        LeaveManagement leave = new LeaveManagement();
         leave.setLeaveUuid(rs.getString("leave_uuid"));
-        leave.setEmployeeId(rs.getString("employee_id"));
-        leave.setDepartmentId(rs.getString("department_id"));
+        leave.setEmployeeUuid(rs.getString("employee_id"));
+        leave.setDepartmentUuid(rs.getString("department_id"));
         leave.setStartDate(rs.getDate("start_date"));
         leave.setEndDate(rs.getDate("end_date"));
         leave.setReason(rs.getString("reason"));
         leave.setStatus(rs.getString("status"));
         leave.setAppliedAt(rs.getTimestamp("applied_at"));
-        leave.setApprovedBy(rs.getString("approved_by"));
-        leave.setApprovedAt(rs.getTimestamp("approved_at"));
-        leave.setUpdatedAt(rs.getTimestamp("updated_at"));
+        leave.setApprovedBy(rs.getString("approved_or_rejected_by"));
+        leave.setApprovedAt(rs.getTimestamp("approved_or_rejected_at") != null ? 
+                                      rs.getTimestamp("approved_or_rejected_at") : null);
         return leave;
-	}
-
-
-
+    }
 }
+
+
+
+

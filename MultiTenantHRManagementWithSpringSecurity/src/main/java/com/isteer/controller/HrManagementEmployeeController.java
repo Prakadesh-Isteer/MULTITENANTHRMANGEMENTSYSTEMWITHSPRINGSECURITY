@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,9 +21,9 @@ import com.isteer.dto.UserDetailsDto;
 import com.isteer.entity.Employee;
 import com.isteer.entity.Roles;
 import com.isteer.enums.HrManagementEnum;
+import com.isteer.service.CustomerUserDetailsService;
 import com.isteer.service.HrManagementEmployeeService;
 import com.isteer.util.JwtUtil;
-import com.isteer.util.CustomerUserDetailsService;
 
 import jakarta.validation.Valid;
 
@@ -42,22 +43,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/hrManagement")
 public class HrManagementEmployeeController {
 	
-	@Autowired
-    private CustomerUserDetailsService userService; 
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtUtil jwtUtil;
 	
 	@Autowired
 	HrManagementEmployeeService service;
 	
+	@PreAuthorize("@authService.hasPermission()")
 	@PostMapping("user")
-	public ResponseEntity<?> registerUser(@RequestParam String departmentId, @Valid @RequestBody List<UserDetailsDto> details) {
+	public ResponseEntity<?> registerUser(@RequestParam String departmentUuid, @Valid @RequestBody UserDetailsDto details) {
 	
-		int status = service.registerUser(details, departmentId);
+		int status = service.registerUser(details, departmentUuid);
 		if(status > 0) {
 			 StatusMessageDto message = new StatusMessageDto(
 		                HrManagementEnum.USER_CREATED_SUCCESS.getStatusCode(),
@@ -70,6 +64,7 @@ public class HrManagementEmployeeController {
 		    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	}
 	
+	@PreAuthorize("@authService.hasPermission()")
 	@PostMapping("addRole")
 	public ResponseEntity<?> addRole(@Valid @RequestBody Roles role) {
 		int status = service.addRole(role);
@@ -85,7 +80,7 @@ public class HrManagementEmployeeController {
 		    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 		
 	}
-	
+	@PreAuthorize("@authService.hasPermission()")
 	@GetMapping("users")
 	public ResponseEntity<?> getAllUsers(){
 		List<?> list = service.getAllUsers();
@@ -98,11 +93,11 @@ public class HrManagementEmployeeController {
 		return ResponseEntity.ok(list) ;
 		
 	}
-	
+	@PreAuthorize("@authService.hasPermission()")
 	@GetMapping("user")
-	public ResponseEntity<?> getUsersById(@RequestParam String employeeId) {
-		List<?> single = service.getuserById(employeeId);
-		if(single.isEmpty()) {
+	public ResponseEntity<?> getUsersById(String userId) {
+		Employee single = service.getuserById(userId);
+		if(single == null) {
 			ErrorMessageDto error = new ErrorMessageDto(HrManagementEnum.NO_USERS_FOUND_LIST.getStatusCode(),
 					HrManagementEnum.NO_USERS_FOUND_LIST.getStatusMessage());
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
@@ -111,9 +106,10 @@ public class HrManagementEmployeeController {
 		return ResponseEntity.ok(single);
 	}
 	
-	@PutMapping("users")
-	public ResponseEntity<?> updateUser(@RequestParam String employeeId, @Valid @RequestBody UserDetailsDto details) {
-		details.setEmployeeId(employeeId);
+	@PreAuthorize("@authService.hasPermission()")
+	@PutMapping("user")
+	public ResponseEntity<?> updateUser(@RequestParam String employeeUuid, @Valid @RequestBody UserDetailsDto details) {
+		details.setEmployeeUuid(employeeUuid);
 		int status = service.updateUser(details);
 	
 		if (status > 0) {
@@ -134,10 +130,11 @@ public class HrManagementEmployeeController {
 	
 	}
 	
-	@DeleteMapping("users")
-	public ResponseEntity<?> deleteEmployee(@RequestParam String employeeId){
+	@PreAuthorize("@authService.hasPermission()")
+	@DeleteMapping("user")
+	public ResponseEntity<?> deleteEmployee(@RequestParam String employeeUuid){
 		
-		int status = service.deleteEmployee(employeeId);
+		int status = service.deleteEmployee(employeeUuid);
 		
 		if (status > 0) {
 			StatusMessageDto message = new StatusMessageDto(
@@ -158,6 +155,7 @@ public class HrManagementEmployeeController {
 	
 }
 	
+	@PreAuthorize("@authService.hasPermission()")
 	@GetMapping("roles")
 	public ResponseEntity<?> getAllAvailableUsersRoles(){
 		List<?> list = service.getAllAvailableRoles();
@@ -171,10 +169,10 @@ public class HrManagementEmployeeController {
 		
 	}
 	
-	
+	@PreAuthorize("@authService.hasPermission()")
 	@PutMapping("users/roles")
-	public ResponseEntity<?> updateUserRole(@RequestParam String employeeId, @RequestParam String roleId) {
-		int status = service.updateUserRole(employeeId,roleId);
+	public ResponseEntity<?> updateUserRole(@RequestParam String employeeUuid, @RequestParam String roleUuid) {
+		int status = service.updateUserRole(employeeUuid,roleUuid);
 	
 		if (status > 0) {
 			StatusMessageDto message = new StatusMessageDto(
@@ -195,25 +193,6 @@ public class HrManagementEmployeeController {
 	}
 	
 	
-	 @PostMapping("/login")
-	    public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password) {
-	        try {
-	            // Authenticate the user
-	            Authentication authentication = authenticationManager.authenticate(
-	                new UsernamePasswordAuthenticationToken(username, password)
-	            );
-
-	            // If authentication is successful, generate JWT token
-	            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-	            String jwtToken = jwtUtil.generateToken(userDetails.getUsername());
-
-	            return ResponseEntity.ok(new JwtResponse(jwtToken)); // Return the token in the response
-	        } catch (BadCredentialsException e) {
-	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-	                    .body("Invalid username or password");
-	        }
-	    }
- 
 	}
 	
 	

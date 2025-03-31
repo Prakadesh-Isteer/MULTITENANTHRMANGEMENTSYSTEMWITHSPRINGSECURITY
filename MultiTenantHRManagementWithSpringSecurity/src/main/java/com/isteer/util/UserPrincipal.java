@@ -30,10 +30,7 @@ public class UserPrincipal implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		List<GrantedAuthority> authorites = new ArrayList<>();
-		authorites.add(new SimpleGrantedAuthority(user.getRoleId()));
-		System.out.println(user.getUserName());
-		System.out.println(user.getPassword());
-		System.out.println(user.getRoleId());
+		authorites.add(new SimpleGrantedAuthority(user.getRoleUuid()));
 		return authorites;
 	}
 
@@ -50,7 +47,7 @@ public class UserPrincipal implements UserDetails {
 	}
 	
 	public String getRole() {
-		return user.getRoleId();
+		return user.getRoleUuid();
 	}
 
    

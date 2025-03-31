@@ -12,10 +12,10 @@ public class UserDetailsRowMapper implements RowMapper<UserDetailsDto> {
 	@Override
 	public UserDetailsDto mapRow(ResultSet rs, int rowNum) throws SQLException {
 		UserDetailsDto employee = new UserDetailsDto();
-		employee.setEmployeeId(rs.getString("employee_uuid"));
-		employee.setTenantId(rs.getString("tenant_id"));
-		employee.setRoleId(rs.getString("role_id"));
-		employee.setDepartmentId(rs.getString("department_id"));
+		employee.setEmployeeUuid(rs.getString("employee_uuid"));
+		employee.setTenantUuid(rs.getString("tenant_id"));
+		employee.setRoleUuid(rs.getString("role_id"));
+		employee.setDepartmentUuid(rs.getString("department_id"));
 		employee.setUserName(rs.getString("userName"));
 		employee.setFirstName(rs.getString("first_name"));
 		employee.setLastName(rs.getString("last_name"));

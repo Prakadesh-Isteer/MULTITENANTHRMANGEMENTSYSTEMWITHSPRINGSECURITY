@@ -3,7 +3,7 @@ package com.isteer.dto;
 public class RequestPermisionDto {
 
 	private String urlPattern;
-	private String roleId;
+	private String roleUuid;
 	
 	public String getUrlPattern() {
 		return urlPattern;
@@ -11,12 +11,13 @@ public class RequestPermisionDto {
 	public void setUrlPattern(String urlPattern) {
 		this.urlPattern = urlPattern;
 	}
-	public String getRoleId() {
-		return roleId;
+	public String getRoleUuid() {
+		return roleUuid;
 	}
-	public void setRoleId(String roleId) {
-		this.roleId = roleId;
+	public void setRoleUuid(String roleUuid) {
+		this.roleUuid = roleUuid;
 	}
+	
 	
 
 }

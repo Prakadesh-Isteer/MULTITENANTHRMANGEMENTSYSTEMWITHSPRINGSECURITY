@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,7 @@ public class HrManagementTenantController {
 	@Autowired
 	HrManagementTenantService service;
 
+	@PreAuthorize("@authService.hasPermission()")
 	@PostMapping("tenant")
 	public ResponseEntity<?> createTenant(@Valid @RequestBody Tenants tenant) {
 		int status = service.createTenant(tenant);
@@ -42,7 +44,7 @@ public class HrManagementTenantController {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	}
 
-
+	@PreAuthorize("@authService.hasPermission()")
 	@GetMapping("tenant")
 	public ResponseEntity<?> getAllTenants() {
 		List<?> list = service.getAllTenants();
@@ -56,9 +58,10 @@ public class HrManagementTenantController {
 		return ResponseEntity.ok(list);
 	}
 
+	@PreAuthorize("@authService.hasPermission()")
 	@PutMapping("tenant")
-	public ResponseEntity<?> updateTenant(@Valid @RequestParam String tenantId, @RequestBody Tenants tenant) {
-		tenant.setTenantId(tenantId);
+	public ResponseEntity<?> updateTenant(@Valid @RequestParam String tenantUuid, @RequestBody Tenants tenant) {
+		tenant.setTenantUuid(tenantUuid);
 		// Ensure tenant object has the tenantId before calling the service method
 		int status = service.updateTenant(tenant);
 
@@ -79,11 +82,11 @@ public class HrManagementTenantController {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	}
 	
-	
+	@PreAuthorize("@authService.hasPermission()")
 	@DeleteMapping("tenant")
-	public ResponseEntity<?> deleteTenant(@RequestParam String tenantId){
+	public ResponseEntity<?> deleteTenant(@RequestParam String tenantUuid){
 		
-		int status = service.deleteTenant(tenantId);
+		int status = service.deleteTenant(tenantUuid);
 		
 		if (status > 0) {
 			StatusMessageDto message = new StatusMessageDto(

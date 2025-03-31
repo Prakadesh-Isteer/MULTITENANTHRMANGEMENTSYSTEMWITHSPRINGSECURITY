@@ -1,4 +1,4 @@
-package com.isteer.util;
+package com.isteer.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class CustomerUserDetailsService implements UserDetailsService {
         	throw new EmployeeIdNullException(HrManagementEnum.Employee_id_null);
         }
         List<GrantedAuthority> authorities = new ArrayList<>();
-        String role = user.getRoleId();
+        String role = user.getRoleUuid();
         authorities.add(new SimpleGrantedAuthority("ROLE_" +role));
 		
         return new User(user.getUserName(), user.getPassword(), authorities) ;

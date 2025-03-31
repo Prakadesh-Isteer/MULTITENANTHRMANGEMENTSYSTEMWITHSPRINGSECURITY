@@ -14,10 +14,10 @@ public class EmployeeRowMapper implements RowMapper<Employee> {
 	@Override
 	public Employee mapRow(ResultSet rs, int rowNum) throws SQLException {
 		Employee employee = new Employee();
-		employee.setEmployeeId(rs.getString("employee_uuid"));
-		employee.setTenantId(rs.getString("tenant_id"));
-		employee.setRoleId(rs.getString("role_id"));
-		employee.setDepartmentId(rs.getString("department_id"));
+		employee.setEmployeeUuid(rs.getString("employee_uuid"));
+		employee.setTenantUuid(rs.getString("tenant_id"));
+		employee.setRoleUuid(rs.getString("role_id"));
+		employee.setDepartmentUuid(rs.getString("department_id"));
 		employee.setUserName(rs.getString("userName"));
 		employee.setPassword(rs.getString("password"));
 		employee.setFirstName(rs.getString("first_name"));

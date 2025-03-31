@@ -18,6 +18,16 @@ import com.isteer.exception.DepartmentNotFoundException;
 //i used this annotation to display the data in json form directly. 
 @ResponseBody
 public class GlobalExceptionHandler {
+	
+	@ExceptionHandler(Exception.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorMessageDto  Exception(Exception e) {
+		ErrorMessageDto invaildOperation = new ErrorMessageDto();
+		invaildOperation.setErrorCode(9888);
+		invaildOperation.setErrorMessage(e.getMessage());
+		e.printStackTrace();
+		return invaildOperation;
+	}
 	@ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorMessageDto MethodArgumentNotValidException(org.springframework.web.bind.MethodArgumentNotValidException e) {
@@ -158,6 +168,42 @@ public class GlobalExceptionHandler {
      ErrorMessageDto invaildOperation = new ErrorMessageDto();
 		invaildOperation.setErrorCode(HrManagementEnum.Illegal_Argumnet_role.getStatusCode());
 		invaildOperation.setErrorMessage(HrManagementEnum.Illegal_Argumnet_role.getStatusMessage());
+		return invaildOperation;
+	}
+	
+	@ExceptionHandler(org.springframework.security.authorization.AuthorizationDeniedException.class)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	public ErrorMessageDto AuthorizationDeniedException (org.springframework.security.authorization.AuthorizationDeniedException e) {
+		ErrorMessageDto invaildOperation = new ErrorMessageDto();
+		invaildOperation.setErrorCode(HrManagementEnum.AUTHORIZATION_DEINED.getStatusCode());
+		invaildOperation.setErrorMessage(HrManagementEnum.AUTHORIZATION_DEINED.getStatusMessage());
+		return invaildOperation;
+	}
+	
+	@ExceptionHandler(io.jsonwebtoken.ExpiredJwtException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorMessageDto AuthorizationDeniedException (io.jsonwebtoken.ExpiredJwtException e) {
+		ErrorMessageDto invaildOperation = new ErrorMessageDto();
+		invaildOperation.setErrorCode(HrManagementEnum.TOKEN_EXPIRATION.getStatusCode());
+		invaildOperation.setErrorMessage(HrManagementEnum.TOKEN_EXPIRATION.getStatusMessage());
+		return invaildOperation;
+	}
+	
+	@ExceptionHandler(org.springframework.dao.EmptyResultDataAccessException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorMessageDto EmptyResultDataAccessException (org.springframework.dao.EmptyResultDataAccessException e) {
+		ErrorMessageDto invaildOperation = new ErrorMessageDto();
+		invaildOperation.setErrorCode(HrManagementEnum.EMPTY_DATA_EXCEPTION.getStatusCode());
+		invaildOperation.setErrorMessage(HrManagementEnum.EMPTY_DATA_EXCEPTION.getStatusMessage());
+		return invaildOperation;
+	}
+	
+	@ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorMessageDto BadCredentialsException (org.springframework.security.authentication.BadCredentialsException e) {
+		ErrorMessageDto invaildOperation = new ErrorMessageDto();
+		invaildOperation.setErrorCode(HrManagementEnum.EMPTY_DATA_EXCEPTION.getStatusCode());
+		invaildOperation.setErrorMessage(HrManagementEnum.EMPTY_DATA_EXCEPTION.getStatusMessage());
 		return invaildOperation;
 	}
 	

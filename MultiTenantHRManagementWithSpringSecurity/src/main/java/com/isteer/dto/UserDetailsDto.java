@@ -6,10 +6,10 @@ public class UserDetailsDto {
 	
 
 	
-	private String employeeId;
-	private String roleId;
-	private String tenantId;
-	private String departmentId;
+	private String employeeUuid;
+	private String roleUuid;
+	private String tenantUuid;
+	private String departmentUuid;
 	@NotBlank(message = "PASSWORD FIELD CANNOT BE EMPTY")
     private String password;
 	@NotBlank(message = "USER NAME FIELD CANNOT BE EMPTY")
@@ -17,7 +17,7 @@ public class UserDetailsDto {
 	@NotBlank(message = "FIRST FIELD CANNOT BE EMPTY")
 	private String firstName;
 	@NotBlank(message = "LAST NAME FIELD CANNOT BE EMPTY")
-	private String lastName;
+	private String lastName;	
 	@NotBlank(message = "EMAIL FIELD CANNOT BE EMPTY")
 	private String email;
 	@NotBlank(message = "PHONE NUMBER FIELD CANNOT BE EMPTY")
@@ -29,30 +29,31 @@ public class UserDetailsDto {
 	@NotBlank(message = "JOB TITLE FIELD CANNOT BE EMPTY")
 	private String jobTitle;
 
-	public String getEmployeeId() {
-		return employeeId;
+	public String getEmployeeUuid() {
+		return employeeUuid;
 	}
-	public void setEmployeeId(String employeeId) {
-		this.employeeId = employeeId;
+	public void setEmployeeUuid(String employeeUuid) {
+		this.employeeUuid = employeeUuid;
 	}
-	public String getRoleId() {
-		return roleId;
+	public String getRoleUuid() {
+		return roleUuid;
 	}
-	public void setRoleId(String roleId) {
-		this.roleId = roleId;
+	public void setRoleUuid(String roleUuid) {
+		this.roleUuid = roleUuid;
 	}
-	public String getTenantId() {
-		return tenantId;
+	public String getTenantUuid() {
+		return tenantUuid;
 	}
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
+	public void setTenantUuid(String tenantUuid) {
+		this.tenantUuid = tenantUuid;
 	}
-	public String getDepartmentId() {
-		return departmentId;
+	public String getDepartmentUuid() {
+		return departmentUuid;
 	}
-	public void setDepartmentId(String departmentId) {
-		this.departmentId = departmentId;
+	public void setDepartmentUuid(String departmentUuid) {
+		this.departmentUuid = departmentUuid;
 	}
+	
 	public String getUserName() {
 		return userName;
 	}

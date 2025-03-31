@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,8 @@ import com.isteer.dto.StatusMessageDto;
 import com.isteer.entity.Departments;
 import com.isteer.entity.Employee;
 import com.isteer.enums.HrManagementEnum;
+import com.isteer.exception.EmployeeIdNullException;
+import com.isteer.exception.TenantIdNullException;
 import com.isteer.service.HrManagementDepartmentService;
 
 import jakarta.validation.Valid;
@@ -33,11 +36,11 @@ public class HrManagementDepartmentController {
 	@Autowired
 	HrManagementDepartmentService service;
 	
-		
+	@PreAuthorize("@authService.hasPermission()")	
 	@PostMapping("departments")
-	public ResponseEntity<?> addDepartment(@RequestParam String tenantId ,@Valid @RequestBody Departments departments) {
-		  departments.setTenantId(tenantId);
-	    int status = service.addDepartment(tenantId, departments);
+	public ResponseEntity<?> addDepartment(@RequestParam String tenantUuid ,@Valid @RequestBody Departments departments) {
+		  departments.setTenantUuid(tenantUuid);
+	    int status = service.addDepartment(tenantUuid, departments);
 
 	    if (status > 0) {
 	        // Department created successfully
@@ -66,9 +69,11 @@ public class HrManagementDepartmentController {
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	}
 	
+	@PreAuthorize("@authService.hasPermission()")
 	@GetMapping("/departments")
-	public ResponseEntity<?> getAllDepartments() {
-	List<?> list = service.getAllDepartments();
+	public ResponseEntity<?> getAllDepartments(@RequestParam String tenantUuid) {
+	
+	List<?> list = service.getAllDepartments(tenantUuid);
 	
 	if (list.isEmpty()) {
 		ErrorMessageDto error = new ErrorMessageDto(HrManagementEnum.No_list_of_tenansts.getStatusCode(),
@@ -79,10 +84,10 @@ public class HrManagementDepartmentController {
 	return ResponseEntity.ok(list);
 	}
 	
-	
+	@PreAuthorize("@authService.hasPermission()")
 	@PutMapping("departments")
-	public ResponseEntity<?> updateDepartMent(@Valid @RequestParam String departmentId, @RequestBody Departments department) {
-	     department.setDepartmentId(departmentId);
+	public ResponseEntity<?> updateDepartMent(@Valid @RequestParam String departmentUuid, @RequestBody Departments department) {
+	     department.setDepartmentUuid(departmentUuid);
 		int status = service.updateTenant(department);
 		
 		if (status > 0) {
@@ -103,10 +108,11 @@ public class HrManagementDepartmentController {
 	
 	}
 	
+	@PreAuthorize("@authService.hasPermission()")
 	@DeleteMapping("department")
-	public ResponseEntity<?> deleteDepartment(@RequestParam String departmentId){
+	public ResponseEntity<?> deleteDepartment(@RequestParam String departmentUuid){
 		
-		int status = service.deleteDepartment(departmentId);
+		int status = service.deleteDepartment(departmentUuid);
 		
 		if (status > 0) {
 			StatusMessageDto message = new StatusMessageDto(
@@ -126,10 +132,10 @@ public class HrManagementDepartmentController {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	
 }
-	
+	@PreAuthorize("@authService.hasPermission()")
 	@GetMapping("department/employee")
-	public ResponseEntity<?> getEmployeesByDepartment(@RequestParam String departmentId) {
-		List<?> list = service.getAllEmployeesByDepartmentId(departmentId);
+	public ResponseEntity<?> getEmployeesByDepartment(@RequestParam String departmentUuid) {
+		List<?> list = service.getAllEmployeesByDepartmentId(departmentUuid);
 		if (list.isEmpty()) {
 			ErrorMessageDto error = new ErrorMessageDto(HrManagementEnum.No_list_of_tenansts.getStatusCode(),
 					HrManagementEnum.No_list_of_tenansts.getStatusMessage());

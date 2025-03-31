@@ -3,6 +3,7 @@ package com.isteer.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -10,55 +11,68 @@ import com.isteer.dto.UserDetailsDto;
 import com.isteer.entity.Employee;
 import com.isteer.entity.Roles;
 import com.isteer.repository.EmployeeRepoDaoImpl;
+import com.isteer.repository.LeaveRepoDaoImpl;
 
 @Service
 public class HrManagementEmployeeService {
 
 	
 	@Autowired
-	EmployeeRepoDaoImpl repo;
+	EmployeeRepoDaoImpl employeeRepoDaoImpl;
+
 	
 	 @Autowired
 	    private BCryptPasswordEncoder passwordEncoder;
 
-	    public int registerUser(List<UserDetailsDto> details, String departmentId) {
+	    public int registerUser(UserDetailsDto details, String departmentId) {
 	        // Encode the password for each user in the list
-	        for (UserDetailsDto userDetails : details) {
+
 	            // Encoding the password using BCryptPasswordEncoder
-	            userDetails.setPassword(passwordEncoder.encode(userDetails.getPassword()));
-	        }
+	            details.setPassword(passwordEncoder.encode(details.getPassword()));
+	            
+	      
+	        
 
 	        // Now save the users with the encoded password
-	        return repo.registerEmployees(details, departmentId);
+	        return employeeRepoDaoImpl.registerEmployee(details, departmentId);
 	    }
 	
 	public List<Employee> getAllUsers(){
-		return repo.getAllUsers();
+		return employeeRepoDaoImpl.getAllUsers();
 	}
 	
-	public List<Employee> getuserById(String employeeId){
-		return repo.getUsersById(employeeId);
+	public Employee getuserById(String userId){
+		
+		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+		Employee loggedInEmployee = employeeRepoDaoImpl.findByUserName(userName);
+
+		return loggedInEmployee;
+	
 	}
 	
 	public int addRole(Roles role) {
-		return repo.addRole(role);
+		return employeeRepoDaoImpl.addRole(role);
 	}
 	
 	public int updateUser(UserDetailsDto details) {
-		return repo.updateUser(details);
+		
+	            // Encoding the password using BCryptPasswordEncoder
+	    details.setPassword(passwordEncoder.encode(details.getPassword()));
+	       
+		return employeeRepoDaoImpl.updateUser(details);
 	}
 	
 	public int deleteEmployee(String employeeId) {
-		return repo.deleteEmployee(employeeId);
+		return employeeRepoDaoImpl.deleteEmployee(employeeId);
 	}
 	
 	public List<Roles> getAllAvailableRoles() {
-		return repo.getAllAvailableRoles();
+		return employeeRepoDaoImpl.getAllAvailableRoles();
 		
 	}
 	
 	public int updateUserRole(String employeeId ,String roleId) {
-		return repo.updateUserRole(employeeId,roleId);
+		return employeeRepoDaoImpl.updateUserRole(employeeId,roleId);
 	}
 		
 	

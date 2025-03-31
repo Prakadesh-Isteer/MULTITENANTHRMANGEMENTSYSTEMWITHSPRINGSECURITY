@@ -18,6 +18,7 @@ import com.isteer.entity.Departments;
 import com.isteer.entity.Employee;
 import com.isteer.enums.HrManagementEnum;
 import com.isteer.exception.DepartmentIdNullException;
+import com.isteer.exception.TenantIdNullException;
 import com.isteer.repository.dao.DeapartmentRepoDao;
 import com.isteer.util.DepartmentRowMapper;
 import com.isteer.util.EmployeeRowMapper;
@@ -76,7 +77,7 @@ public class DepartmentRepoDaoImpl implements DeapartmentRepoDao{
         SqlParameterSource params = new MapSqlParameterSource()
         		.addValue("departmentUuid", departmentUuid)
         		.addValue("headId", hodId)
-                .addValue("tenantId", department.getTenantId())
+                .addValue("tenantId", department.getTenantUuid())
                 .addValue("departmentName", department.getDepartmentName())
                 .addValue("email", department.getEmail())
                 .addValue("phone", department.getPhoneNumber())
@@ -103,7 +104,7 @@ public class DepartmentRepoDaoImpl implements DeapartmentRepoDao{
 	@Override
 	public int updateDepartment(Departments department) {
 		
-		Optional<Departments> existingDepartment = findbyId(department.getDepartmentId());
+		Optional<Departments> existingDepartment = findbyId(department.getDepartmentUuid());
 		
 		if(!existingDepartment.isPresent()) {
 			return -1;
@@ -112,7 +113,7 @@ public class DepartmentRepoDaoImpl implements DeapartmentRepoDao{
 		String sql = "UPDATE departments SET department_name = :departmentName, contact_email = :email, contact_phone = :phoneNumber, description = :description WHERE department_uuid = :departmentId";
 		
 		SqlParameterSource param = new MapSqlParameterSource()
-				.addValue("departmentId", department.getDepartmentId())
+				.addValue("departmentId", department.getDepartmentUuid())
 				.addValue("departmentName", department.getDepartmentName())
 				.addValue("email", department.getEmail())
 				.addValue("phoneNumber", department.getPhoneNumber())
@@ -129,10 +130,15 @@ public class DepartmentRepoDaoImpl implements DeapartmentRepoDao{
 	
 	@Transactional
 	@Override
-	public List<Departments> getAllDepartments(){
-		String sql = "SELECT d.department_uuid, d.department_head_uuid, d.tenant_id, d.department_name, d.contact_email, d.contact_phone, d.description FROM departments d JOIN tenants t ON d.tenant_id = t.tenant_uuid WHERE d.department_status = :status AND t.tenant_status = 1";
+	public List<Departments> getAllDepartments(String tenantUuid){
+		if (tenantUuid == null || tenantUuid.trim().isEmpty()) {
+			throw new TenantIdNullException(HrManagementEnum.Tenant_id_null);
+		}
+		
+		String sql = "SELECT d.department_uuid, d.department_head_uuid, d.tenant_id, d.department_name, d.contact_email, d.contact_phone, d.description FROM departments d JOIN tenants t ON d.tenant_id = t.tenant_uuid WHERE d.department_status = :status AND t.tenant_status = 1  AND d.tenant_id = :tenantId";
 	 SqlParameterSource param = new MapSqlParameterSource()
-			 .addValue("status", 1);
+			 .addValue("status", 1)
+			 .addValue("tenantId", tenantUuid);
 	 return template.query(sql, param , new DepartmentRowMapper());
 	}
 	

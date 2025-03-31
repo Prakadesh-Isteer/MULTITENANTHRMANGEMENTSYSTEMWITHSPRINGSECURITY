@@ -17,18 +17,21 @@ public class HrManagementDepartmentService {
 
 	public int addDepartment(String tenantId, Departments departments) {
 		// First, check if the tenant exists
-		boolean tenantExists = repo.isTenantExist(departments.getTenantId());
+		boolean tenantExists = repo.isTenantExist(departments.getTenantUuid());
 
 		if (!tenantExists) {
 			return -1; // Tenant not found
 		}
 
 		// Check if the department already exists
-		boolean departmentExists = repo.isDepartmentExist(departments.getDepartmentName(), departments.getTenantId());
+		boolean departmentExists = repo.isDepartmentExist(departments.getDepartmentName(), departments.getTenantUuid());
 
 		if (departmentExists) {
 			return -2; // Department already exists
 		}
+		
+		
+		
 
 		// If tenant and department do not exist, proceed to add the new department
 		return repo.addDepartment(tenantId, departments);
@@ -39,9 +42,9 @@ public class HrManagementDepartmentService {
 
 	}
 
-	public List<Departments> getAllDepartments() {
+	public List<Departments> getAllDepartments(String tenantUuid) {
 
-		return repo.getAllDepartments();
+		return repo.getAllDepartments(tenantUuid);
 
 	}
 	

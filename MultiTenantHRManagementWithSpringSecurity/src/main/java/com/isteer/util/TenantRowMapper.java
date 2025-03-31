@@ -11,7 +11,7 @@ public class TenantRowMapper implements RowMapper<Tenants> {
 	@Override
 	public Tenants mapRow(ResultSet rs, int rowNum) throws SQLException {
 	  Tenants tenant = new Tenants();
-	  tenant.setTenantId(rs.getString("tenant_uuid"));
+	  tenant.setTenantUuid(rs.getString("tenant_uuid"));
 	  tenant.setTenantName(rs.getString("tenant_name"));
 	  tenant.setAddress(rs.getString("address"));
 	  tenant.setEmail(rs.getString("contact_email"));

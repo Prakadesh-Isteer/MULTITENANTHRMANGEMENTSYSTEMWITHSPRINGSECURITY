@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 public class LeaveManagement {
 	
 	private String leaveUuid;
-    private String employeeId;
-    private String departmentId;
+    private String employeeUuid;
+    private String departmentUuid;
     private Date startDate;
     private Date endDate;
     private String reason;
@@ -17,25 +17,26 @@ public class LeaveManagement {
     private Date appliedAt;
     private String approvedBy;
     private Date approvedAt;
-    private Date updatedAt;
+
 	
-    public String getLeaveUuid() {
+   
+	public String getLeaveUuid() {
 		return leaveUuid;
 	}
 	public void setLeaveUuid(String leaveUuid) {
 		this.leaveUuid = leaveUuid;
 	}
-	public String getEmployeeId() {
-		return employeeId;
+	public String getEmployeeUuid() {
+		return employeeUuid;
 	}
-	public void setEmployeeId(String employeeId) {
-		this.employeeId = employeeId;
+	public void setEmployeeUuid(String employeeUuid) {
+		this.employeeUuid = employeeUuid;
 	}
-	public String getDepartmentId() {
-		return departmentId;
+	public String getDepartmentUuid() {
+		return departmentUuid;
 	}
-	public void setDepartmentId(String departmentId) {
-		this.departmentId = departmentId;
+	public void setDepartmentUuid(String departmentUuid) {
+		this.departmentUuid = departmentUuid;
 	}
 	public Date getStartDate() {
 		return startDate;
@@ -79,12 +80,6 @@ public class LeaveManagement {
 	public void setApprovedAt(Date approvedAt) {
 		this.approvedAt = approvedAt;
 	}
-	public Date getUpdatedAt() {
-		return updatedAt;
-	}
-	public void setUpdatedAt(Date updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-
+	
 
 }

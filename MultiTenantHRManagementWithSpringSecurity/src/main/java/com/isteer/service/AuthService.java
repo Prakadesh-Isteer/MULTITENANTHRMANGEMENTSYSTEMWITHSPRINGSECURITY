@@ -1,5 +1,7 @@
 package com.isteer.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -46,26 +48,31 @@ public class AuthService {
 	    
 	    // Fetch user details based on username
 	    Employee user = repoData.findByUserName(userName);
-	    System.out.println(user.getRoleId());
+	    System.out.println(user.getRoleUuid());
+	    System.out.println(url);
 	    
 	    // Fetch URL permissions and HTTP method permissions
-	    RequestPermisionDto permission = repo.findUrl(url);
-	    HttpMethodRoleRights methodPermission = repo.findHttpMethod(httpMethod);
+	    List<RequestPermisionDto>  permission = repo.findUrl(url);
+	    List<HttpMethodRoleRights> methodPermission = repo.findHttpMethod(httpMethod);
 	    
 	    System.out.println(methodPermission);
 	    System.out.println(httpMethod);
 	    
 	    // Check if the user has permission based on roleId for URL permissions
-	    boolean urlPermission = false;
-	    if (permission != null && permission.getRoleId().equals(user.getRoleId())) {
-	        urlPermission = true;
-	    }
+	    
+	    boolean urlPermission = permission.stream().anyMatch(r -> r.getRoleUuid().equals(user.getRoleUuid()));
+	    
+//	    boolean urlPermission = false;
+//	    if (permission != null && permission.getRoleId().equals(user.getRoleId())) {
+//	        urlPermission = true;
+//	    }
+	    boolean methodPermissionStatus = methodPermission.stream().anyMatch(m-> m.getRoleUuid().equals(user.getRoleUuid()));
 	    
 	    // Check if the user has permission based on roleId for HTTP method permissions
-	    boolean methodPermissionStatus = false;
-	    if (methodPermission != null && methodPermission.getRoleId().equals(user.getRoleId())) {
-	        methodPermissionStatus = true;
-	    }
+//	    boolean methodPermissionStatus = false;
+//	    if (methodPermission != null && methodPermission.getRoleId().equals(user.getRoleId())) {
+//	        methodPermissionStatus = true;
+//	    }
 	    
 	    System.out.println(urlPermission);
 	    System.out.println(methodPermissionStatus);

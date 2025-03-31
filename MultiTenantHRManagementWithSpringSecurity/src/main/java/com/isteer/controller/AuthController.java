@@ -1,14 +1,10 @@
 package com.isteer.controller;
 
-import java.util.Collections;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,10 +17,6 @@ import com.isteer.dto.StatusMessageDto;
 import com.isteer.dto.UserDetailsDto;
 import com.isteer.enums.HrManagementEnum;
 import com.isteer.service.AuthService;
-import com.isteer.util.CustomerUserDetailsService;
-import com.isteer.util.JwtUtil;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -44,7 +36,7 @@ public class AuthController {
 		return ResponseEntity.ok(wrktoken);
     	   	
 }
-    
+	@PreAuthorize("@authService.hasPermission()")
     @PostMapping("/addUrl")
     public ResponseEntity<?> addUrl(@RequestParam String endpointUrl, @RequestParam String roleUuid) {
 
@@ -75,7 +67,7 @@ public class AuthController {
         }
     }
     
-    
+	@PreAuthorize("@authService.hasPermission()")
  // Endpoint to map HTTP method to role using UUID
     @PostMapping("/addHttpMethod")
     public ResponseEntity<?> addHttpMethodMapping(@RequestParam String httpMethod, @RequestParam String roleUuid) {

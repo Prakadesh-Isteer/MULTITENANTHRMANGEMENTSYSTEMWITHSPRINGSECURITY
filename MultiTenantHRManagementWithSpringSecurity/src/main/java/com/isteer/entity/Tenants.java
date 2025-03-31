@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 @Component
 public class Tenants {
 
-	private String tenantId;
+	private String tenantUuid;
 	@NotBlank(message = "TENANT NAME FIELD SHOULD NOT BE EMPTY")
 	private String tenantName;
 	@NotBlank(message = "TENANT ADDRESS FIELD SHOULD NOT BE EMPTY")
@@ -23,12 +23,7 @@ public class Tenants {
 	@NotBlank(message = "TENANT CITY FIELD SHOULD NOT BE EMPTY")
 	private String city;
 	
-	public String getTenantId() {
-		return tenantId;
-	}
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
-	}
+	
 	public String getTenantName() {
 		return tenantName;
 	}
@@ -70,6 +65,12 @@ public class Tenants {
 	}
 	public void setCity(String city) {
 		this.city = city;
+	}
+	public String getTenantUuid() {
+		return tenantUuid;
+	}
+	public void setTenantUuid(String tenantUuid) {
+		this.tenantUuid = tenantUuid;
 	}
 	
 

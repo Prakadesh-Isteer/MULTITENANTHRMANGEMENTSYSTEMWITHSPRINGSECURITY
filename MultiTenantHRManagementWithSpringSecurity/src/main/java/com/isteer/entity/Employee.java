@@ -7,12 +7,12 @@ import jakarta.validation.constraints.NotBlank;
 @Component
 public class Employee {
 	
-	private String employeeId;
-	private String roleId;
+	private String employeeUuid;
+	private String roleUuid;
 	@NotBlank(message = "TENANT ID FIELD CANNOT BE EMPTY")
-	private String tenantId;
+	private String tenantUuid;
 	@NotBlank(message = "DEPARTMENT ID FIELD CANNOT BE EMPTY")
-	private String departmentId;
+	private String departmentUuid;
 	@NotBlank(message = "USERNAME FIELD CANNOT BE EMPTY")
 	private String userName;
 	@NotBlank(message = "PASSWORD FIELD CANNOT BE EMPTY")
@@ -32,30 +32,6 @@ public class Employee {
 	@NotBlank(message = "JOB TITLE FIELD CANNOT BE EMPTY")
 	private String jobTitle;
 	
-	public String getEmployeeId() {
-		return employeeId;
-	}
-	public void setEmployeeId(String employeeId) {
-		this.employeeId = employeeId;
-	}
-	public String getRoleId() {
-		return roleId;
-	}
-	public void setRoleId(String roleId) {
-		this.roleId = roleId;
-	}
-	public String getTenantId() {
-		return tenantId;
-	}
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
-	}
-	public String getDepartmentId() {
-		return departmentId;
-	}
-	public void setDepartmentId(String departmentId) {
-		this.departmentId = departmentId;
-	}
 	public String getUserName() {
 		return userName;
 	}
@@ -110,10 +86,34 @@ public class Employee {
 	public void setJobTitle(String jobTitle) {
 		this.jobTitle = jobTitle;
 	}
+	public String getEmployeeUuid() {
+		return employeeUuid;
+	}
+	public void setEmployeeUuid(String employeeUuid) {
+		this.employeeUuid = employeeUuid;
+	}
+	public String getRoleUuid() {
+		return roleUuid;
+	}
+	public void setRoleUuid(String roleUuid) {
+		this.roleUuid = roleUuid;
+	}
+	public String getTenantUuid() {
+		return tenantUuid;
+	}
+	public void setTenantUuid(String tenantUuid) {
+		this.tenantUuid = tenantUuid;
+	}
+	public String getDepartmentUuid() {
+		return departmentUuid;
+	}
+	public void setDepartmentUuid(String departmentUuid) {
+		this.departmentUuid = departmentUuid;
+	}
 	@Override
 	public String toString() {
-		return "Employee [employeeId=" + employeeId + ", roleId=" + roleId + ", tenantId=" + tenantId
-				+ ", departmentId=" + departmentId + ", userName=" + userName + ", password=" + password
+		return "Employee [employeeUuid=" + employeeUuid + ", roleUuid=" + roleUuid + ", tenantUuid=" + tenantUuid
+				+ ", departmentUuid=" + departmentUuid + ", userName=" + userName + ", password=" + password
 				+ ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email + ", phoneNumber="
 				+ phoneNumber + ", address=" + address + ", dateOfJoining=" + dateOfJoining + ", jobTitle=" + jobTitle
 				+ "]";

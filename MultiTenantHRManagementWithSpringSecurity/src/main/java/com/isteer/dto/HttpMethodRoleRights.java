@@ -4,7 +4,7 @@ public class HttpMethodRoleRights {
 	
 	private String httpMethod;
 	
-	private String roleId;
+	private String roleUuid;
 
 	public String getHttpMethod() {
 		return httpMethod;
@@ -14,12 +14,12 @@ public class HttpMethodRoleRights {
 		this.httpMethod = httpMethod;
 	}
 
-	public String getRoleId() {
-		return roleId;
+	public String getRoleUuid() {
+		return roleUuid;
 	}
 
-	public void setRoleId(String roleId) {
-		this.roleId = roleId;
+	public void setRoleUuid(String roleUuid) {
+		this.roleUuid = roleUuid;
 	}
 
 }

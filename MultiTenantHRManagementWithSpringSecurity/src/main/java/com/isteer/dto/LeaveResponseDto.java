@@ -5,7 +5,7 @@ import java.util.Date;
 public class LeaveResponseDto {
 	
 	    private String leaveUuid;
-		private String employeeId;
+		private String employeeUuid;
 	    private String departmentName;
 	    private Date startDate;
 	    private Date endDate;
@@ -19,12 +19,7 @@ public class LeaveResponseDto {
 	public void setLeaveUuid(String leaveUuid) {
 		this.leaveUuid = leaveUuid;
 	}
-	public String getEmployeeId() {
-		return employeeId;
-	}
-	public void setEmployeeId(String employeeId) {
-		this.employeeId = employeeId;
-	}
+	
 	public String getDepartmentName() {
 		return departmentName;
 	}
@@ -54,6 +49,12 @@ public class LeaveResponseDto {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public String getEmployeeUuid() {
+		return employeeUuid;
+	}
+	public void setEmployeeUuid(String employeeUuid) {
+		this.employeeUuid = employeeUuid;
 	}
 
 

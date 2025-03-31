@@ -8,13 +8,13 @@ import com.isteer.entity.Roles;
 
 public interface EmployeeRepoDao {
 
-	public int registerEmployees(List<UserDetailsDto> detailsList , String departmentId);
+	public int registerEmployee(UserDetailsDto detailsList , String departmentId);
 	
 	public int addRole(Roles role);
 	
 	public List<Employee> getAllUsers();
 	
-	public List<Employee> getUsersById(String employeeId);
+	public List<Employee> getUsersById(String userId);
 	
 	public int updateUser(UserDetailsDto details);
 

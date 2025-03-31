@@ -20,19 +20,25 @@ public class AuthRepoImpl {
 	@Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
-	public RequestPermisionDto findUrl(String url){
-		String findUrl = "SELECT  endpoint_id, role_id FROM endpoints_role_mapping WHERE endpoint_id = :url";
+	public List<RequestPermisionDto> findUrl(String url){
+		String findUrl = "SELECT erm.endpoint_id, erm.role_id " +
+                "FROM endpoints_role_mapping erm " +
+                "JOIN endpoints e ON erm.endpoint_id = e.endpoint_uuid " +
+                "WHERE e.endpoint_url = :url";
 		SqlParameterSource param = new MapSqlParameterSource()
 				.addValue("url", url);
-		RequestPermisionDto accessible = namedParameterJdbcTemplate.queryForObject(findUrl, param, new UrlPermissionRowMapper());
+		List<RequestPermisionDto> accessible = namedParameterJdbcTemplate.query(findUrl, param, new UrlPermissionRowMapper());
 		return accessible;
 	}
 	
-	public HttpMethodRoleRights findHttpMethod(String httpMethod){
-		String findHttp = "SELECT http_id, role_id FROM http_method_mapping WHERE http_id = :httpMethod";
+	public List<HttpMethodRoleRights> findHttpMethod(String httpMethod){
+		String findHttp = "SELECT hmm.http_id, hmm.role_id " +
+                "FROM http_method_mapping hmm " +
+                "JOIN http_methods hm ON hmm.http_id = hm.http_method_uuid " +
+                "WHERE hm.http_method = :httpMethod";
 		SqlParameterSource param = new MapSqlParameterSource()
 				.addValue("httpMethod", httpMethod);
-		HttpMethodRoleRights roles = namedParameterJdbcTemplate.queryForObject(findHttp, param, new HttpMethodPermissionRowmapper());
+		List<HttpMethodRoleRights> roles = namedParameterJdbcTemplate.query(findHttp, param, new HttpMethodPermissionRowmapper());
 		return roles;
 	}
 
@@ -49,6 +55,7 @@ public class AuthRepoImpl {
         
         // Insert the new endpoint
         namedParameterJdbcTemplate.update(insertEndpointSQL, params);
+        
 
         // Step 2: Insert the mapping into the endpoints_role_mapping table
         String insertMappingSQL = "INSERT INTO endpoints_role_mapping (endpoint_id, role_id) VALUES (:endpointUuid, :roleUuid)";

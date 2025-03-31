@@ -1,61 +1,109 @@
 package com.isteer.service;
 
-import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.isteer.dto.LeaveRequestDto;
-import com.isteer.dto.LeaveResponseDto;
+import com.isteer.entity.Employee;
 import com.isteer.entity.LeaveManagement;
-import com.isteer.enums.HrManagementEnum;
 import com.isteer.exception.EmployeeNotFoundException;
-import com.isteer.exception.LeaveRequestNotFoundException;
+import com.isteer.repository.EmployeeRepoDaoImpl;
 import com.isteer.repository.LeaveRepoDaoImpl;
 
 @Service
 public class HrManagementLeaveService {
 
 	@Autowired
-	LeaveRepoDaoImpl repo;
+	EmployeeRepoDaoImpl employeeRepoDaoImpl;
+	
+	@Autowired
+	LeaveRepoDaoImpl leaveRepoDaoImpl;
+
+
+	
+	@Transactional
 
 	public int applyLeave(LeaveRequestDto leaveRequestDto) {
-		// Apply for leave by calling the repository and return the result (number of
-		// rows affected)
-		try {
-			return repo.applyLeave(leaveRequestDto); // Now returns an int instead of LeaveResponseDto
-		} catch (EmployeeNotFoundException ex) {
-			// Handle exception or let it propagate
-			throw ex; // Re-throw exception if necessary
-		}
+	    // Get the logged-in user details
+	    String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+	    Employee loggedInEmployee = employeeRepoDaoImpl.findByUserName(userName);
+	    String departmentId = loggedInEmployee.getDepartmentUuid();
+	    String userId = loggedInEmployee.getEmployeeUuid();
+
+	    // Set the employee UUID in the leave request DTO
+	    leaveRequestDto.setEmployeeUuid(userId);
+
+	    // Set the start date to the current date
+	    LocalDate startDate = LocalDate.now();
+
+	    // Ensure the end date is not before the start date
+	    if (leaveRequestDto.getEndDate().isBefore(startDate)) {
+	        throw new IllegalArgumentException("End date cannot be before the start date.");
+	    }
+
+	    // Now we call the repository to apply the leave
+	    try {
+	        return leaveRepoDaoImpl.applyLeave(leaveRequestDto, departmentId, startDate);
+	    } catch (EmployeeNotFoundException ex) {
+	        // Handle exception or let it propagate
+	        throw ex;
+	    }
 	}
 
+	
+//	@Transactional
+//	public List<LeaveManagement> getAllLeaves() {
+//		return leaveRepoDaoImpl.getAllLeaves();
+//	}
+	
 	@Transactional
-	public List<LeaveManagement> getAllLeaves() {
-		return repo.getAllLeaves();
+	public List<LeaveManagement> getAllLeavesByStatus(String status) {
+	    // Get the logged-in employee (department head)
+	    String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+	    Employee loggedInEmployee = employeeRepoDaoImpl.findByUserName(userName);
+	    
+	    // Get the department ID of the department head
+	    String departmentId = loggedInEmployee.getDepartmentUuid();
+	    
+	    // Pass the department ID and status to the repository layer to query leaves
+	    return leaveRepoDaoImpl.getAllLeavesByStatus(departmentId, status);
 	}
+
 	
 
-//	    
+	
+	@Transactional
+	public boolean approveLeaveRequest(String leaveUuid) {
+	    // Call the repository to approve the leave request
+//		System.out.println(SecurityContextHolder.getContext().getAuthentication());
+		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+		Employee loggedInEmployee = employeeRepoDaoImpl.findByUserName(userName);
+		String departmentId = loggedInEmployee.getDepartmentUuid();
+		String userId = loggedInEmployee.getEmployeeUuid();
+	    return leaveRepoDaoImpl.approveLeaveRequest(leaveUuid, userId, departmentId);
 
-	 // Approve leave request by delegating the logic to the repository layer
-	 @Transactional
-	    public boolean approveLeaveRequest(String leaveUuid, String approvedBy) {
-	        // Delegate the logic to the repository
-	        return repo.approveLeaveRequest(leaveUuid, approvedBy);
-	    }
+	}
+
 	 
 	 @Transactional
-	    public boolean rejectLeaveRequest(String leaveUuid, String approvedBy) {
-	        // Delegate the logic to the repository
-	        return repo.rejectLeaveRequest(leaveUuid, approvedBy);
+	    public boolean rejectLeaveRequest(String leaveUuid) {
+		 String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+			Employee loggedInEmployee = employeeRepoDaoImpl.findByUserName(userName);
+			String departmentId = loggedInEmployee.getDepartmentUuid();
+			String userId = loggedInEmployee.getEmployeeUuid();
+		 return leaveRepoDaoImpl.rejectLeaveRequest(leaveUuid, userId, departmentId);
 	    }
 	 
 	// Fetch leave history for an employee
-	    public List<LeaveManagement> getLeaveHistory(String employeeUuid) {
-	        return repo.findLeaveHistoryByEmployeeUuid(employeeUuid);
+	    public List<LeaveManagement> getLeaveHistory() {
+	    	String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+			Employee loggedInEmployee = employeeRepoDaoImpl.findByUserName(userName);
+			String userId = loggedInEmployee.getEmployeeUuid();
+	        return leaveRepoDaoImpl.findLeaveHistoryByEmployeeUuid(userId);
 	    }
 }

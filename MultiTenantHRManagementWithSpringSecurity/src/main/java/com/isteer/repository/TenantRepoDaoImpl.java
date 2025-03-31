@@ -75,7 +75,7 @@ public class TenantRepoDaoImpl implements TenantRepoDao{
 	@Override
     public int updateTenant(Tenants tenant) {
         // Check if tenant exists before trying to update
-        Optional<Tenants> existingTenant = findById(tenant.getTenantId());
+        Optional<Tenants> existingTenant = findById(tenant.getTenantUuid());
 
         if (!existingTenant.isPresent()) {
             // If the tenant does not exist, return -1 to indicate failure
@@ -88,7 +88,7 @@ public class TenantRepoDaoImpl implements TenantRepoDao{
                      "tenant_state = :tenantState, tenant_city = :tenantCity WHERE tenant_uuid = :tenantId";
 
         SqlParameterSource param = new MapSqlParameterSource()
-            .addValue("tenantId", tenant.getTenantId())
+            .addValue("tenantId", tenant.getTenantUuid())
             .addValue("tenantName", tenant.getTenantName())
             .addValue("address", tenant.getAddress())
             .addValue("email", tenant.getEmail())

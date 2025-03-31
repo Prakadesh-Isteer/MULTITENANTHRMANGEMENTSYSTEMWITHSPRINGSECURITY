@@ -1,6 +1,5 @@
 package com.isteer.repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,7 +33,7 @@ public class EmployeeRepoDaoImpl implements EmployeeRepoDao {
 	@Autowired
 	NamedParameterJdbcTemplate template;
 
-	
+	@Transactional
 	 // Method to find user by username
     public Employee findByUserName(String userName) {
         // SQL query to fetch user details
@@ -49,22 +48,26 @@ public class EmployeeRepoDaoImpl implements EmployeeRepoDao {
         return template.queryForObject(sql, parameters, new EmployeeRowMapper());
     }
 	
-	@Transactional
+    @Transactional
     @Override
-    public int registerEmployees(List<UserDetailsDto> detailsList, String departmentId) {
+    public int registerEmployee(UserDetailsDto details, String departmentId) {
         if (departmentId == null || departmentId.trim().isEmpty()) {
             throw new DepartmentIdNullException(HrManagementEnum.Department_id_null);
         }
 
-        // Fetch the role_uuid for the 'Employee' role
-        String getRoleIdQuery = "SELECT role_uuid, role_name, description FROM roles WHERE role_name = 'Employee' LIMIT 1";
-        List<Roles> roleList = template.query(getRoleIdQuery, new RolesRowmapper());
+        // Fetch the role_uuid for the 'Employee' role if roleUuid is not provided
+        String roleId = details.getRoleUuid();
 
-        String roleId = null;
-        if (roleList != null && !roleList.isEmpty()) {
-            roleId = roleList.get(0).getRoleId();
-        } else {
-            throw new IllegalArgumentException(HrManagementEnum.ILLEGAL_AGRUMENT);
+        if (roleId == null || roleId.trim().isEmpty()) {
+            // If roleUuid is not provided, fetch the 'Employee' role UUID from the roles table
+            String getRoleIdQuery = "SELECT role_uuid, role_name, description FROM roles WHERE role_name = 'Employee' LIMIT 1";
+            List<Roles> roleList = template.query(getRoleIdQuery, new RolesRowmapper());
+
+            if (roleList != null && !roleList.isEmpty()) {
+                roleId = roleList.get(0).getRoleUuid();  // Use the UUID for 'Employee' role
+            } else {
+                throw new IllegalArgumentException(HrManagementEnum.ILLEGAL_AGRUMENT); // Role not found
+            }
         }
 
         // Fetch tenant_id from the department table using the department_uuid
@@ -81,45 +84,39 @@ public class EmployeeRepoDaoImpl implements EmployeeRepoDao {
         }
 
         if (tenantId == null) {
-            throw new IllegalArgumentException(HrManagementEnum.No_list_of_tenansts);
+            throw new TenantIdNullException(HrManagementEnum.No_list_of_tenansts);
         }
 
-        // Create list of parameter maps for batch insertion
-        List<MapSqlParameterSource> batchParams = new ArrayList<>();
+        UUID uuid = UUID.randomUUID();
+        String employeeUuid = uuid.toString();
 
-        for (UserDetailsDto details : detailsList) {
-            UUID uuid = UUID.randomUUID();
-            String employeeUuid = uuid.toString();
+        // Map parameters for the employee
+        MapSqlParameterSource param = new MapSqlParameterSource()
+                .addValue("employeeId", employeeUuid)
+                .addValue("roleId", roleId) // Use the correct roleId
+                .addValue("tenantId", tenantId)
+                .addValue("departmentId", departmentId)
+                .addValue("userName", details.getUserName())
+                .addValue("password", details.getPassword())
+                .addValue("firstName", details.getFirstName())
+                .addValue("lastName", details.getLastName())
+                .addValue("email", details.getEmail())
+                .addValue("phone", details.getPhoneNumber())
+                .addValue("address", details.getAddress())
+                .addValue("joiningDate", details.getDateOfJoining())
+                .addValue("jobTitle", details.getJobTitle());
 
-            // Map parameters for each employee
-            MapSqlParameterSource param = new MapSqlParameterSource()
-                    .addValue("employeeId", employeeUuid)
-                    .addValue("roleId", roleId)
-                    .addValue("tenantId", tenantId)
-                    .addValue("departmentId", departmentId)
-                    .addValue("userName", details.getUserName())
-                    .addValue("password", details.getPassword())
-                    .addValue("firstName", details.getFirstName())
-                    .addValue("lastName", details.getLastName())
-                    .addValue("email", details.getEmail())
-                    .addValue("phone", details.getPhoneNumber())
-                    .addValue("address", details.getAddress())
-                    .addValue("joiningDate", details.getDateOfJoining())
-                    .addValue("jobTitle", details.getJobTitle());
-
-            batchParams.add(param);
-        }
-
-        // Batch insert the employees
+        // Query to insert the employee
         String registerUserQuery = "INSERT INTO employee (employee_uuid, role_id, tenant_id, department_id, userName, password, first_name, last_name, email, phone, address, date_of_joining, job_title) " +
                 "VALUES (:employeeId, :roleId, :tenantId, :departmentId, :userName, :password, :firstName, :lastName, :email, :phone, :address, :joiningDate, :jobTitle)";
 
-        // Batch update
-        int[] updateCounts = template.batchUpdate(registerUserQuery, batchParams.toArray(new MapSqlParameterSource[0]));
+        // Insert the employee into the database
+        int updateCount = template.update(registerUserQuery, param);
 
-        // Return total number of rows affected
-        return updateCounts.length;
+        // Return number of rows affected
+        return updateCount;
     }
+
 
 	@Transactional
 	@Override
@@ -142,13 +139,13 @@ public class EmployeeRepoDaoImpl implements EmployeeRepoDao {
 	}
 
 	@Transactional
-	@Override
-	public List<Employee> getUsersById(String employeeId) {
-		if (employeeId == null || employeeId.trim().isEmpty()) {
-			throw new EmployeeIdNullException(HrManagementEnum.Employee_id_null);
-		}
+
+	public List<Employee> getUsersById(String userId) {
+//		if (employeeId == null || employeeId.trim().isEmpty()) {
+//			throw new EmployeeIdNullException(HrManagementEnum.Employee_id_null);
+//		}
 		String sql = "SELECT e.employee_uuid, e.role_id, e.tenant_id, e.department_id, e.userName, e.password, e.first_name, e.last_name, e.email, e.phone, e.address, e.date_of_joining, e.job_title FROM employee e JOIN departments d ON e.department_id = d.department_uuid JOIN tenants t ON e.tenant_id = t.tenant_uuid WHERE e.employee_status = :status AND  e.employee_uuid = :employeeId AND d.department_status = 1 AND t.tenant_status = 1";
-		SqlParameterSource param = new MapSqlParameterSource().addValue("status", 1).addValue("employeeId", employeeId);
+		SqlParameterSource param = new MapSqlParameterSource().addValue("status", 1).addValue("employeeId", userId);
 		return template.query(sql, param, new EmployeeRowMapper());
 
 	}
@@ -171,17 +168,17 @@ public class EmployeeRepoDaoImpl implements EmployeeRepoDao {
 	@Transactional
 	@Override
 	public int updateUser(UserDetailsDto details) {
-		if (details.getEmployeeId() == null || details.getEmployeeId().trim().isEmpty()) {
+		if (details.getEmployeeUuid() == null || details.getEmployeeUuid().trim().isEmpty()) {
 			throw new EmployeeIdNullException(HrManagementEnum.Employee_id_null);
 		}
-		Optional<Employee> existingUser = findById(details.getEmployeeId());
+		Optional<Employee> existingUser = findById(details.getEmployeeUuid());
 		if (!existingUser.isPresent()) {
 			return -1;
 		}
 
 		String sql = "UPDATE employee SET userName = :userName, password = :password, first_name = :firstName, last_name = :lastName, email = :email, phone = :phone, address = :address, date_of_joining = :dateOfJoining, job_title = :jobTitle WHERE employee_status = :status AND employee_uuid = :employeeId";
 
-		SqlParameterSource param = new MapSqlParameterSource().addValue("employeeId", details.getEmployeeId())
+		SqlParameterSource param = new MapSqlParameterSource().addValue("employeeId", details.getEmployeeUuid())
 				.addValue("userName", details.getUserName())
 				.addValue("password", details.getPassword()).addValue("firstName", details.getFirstName())
 				.addValue("lastName", details.getLastName()).addValue("email", details.getEmail())
@@ -247,10 +244,10 @@ public class EmployeeRepoDaoImpl implements EmployeeRepoDao {
 	    }
 	    
 	    Employee employee = new Employee();
-	    employee.setEmployeeId(employeeId); // Correctly set employeeId
-	    employee.setRoleId(roleId);          // Correctly set roleId
+	    employee.setEmployeeUuid(employeeId); // Correctly set employeeId
+	    employee.setRoleUuid(roleId);          // Correctly set roleId
 	    
-	    Optional<Employee> existingUser = findById(employee.getEmployeeId());
+	    Optional<Employee> existingUser = findById(employee.getEmployeeUuid());
 	    if (!existingUser.isPresent()) {
 	        return -1;
 	    }
@@ -265,7 +262,7 @@ public class EmployeeRepoDaoImpl implements EmployeeRepoDao {
 	    List<Roles> roleList = template.query(getRoleIdQuery, param, new RolesRowmapper());
 
 	    if (roleList != null && !roleList.isEmpty()) {
-	        roleId = roleList.get(0).getRoleId();
+	        roleId = roleList.get(0).getRoleUuid();
 	    } else {
 
 	        throw new IllegalArgumentException(HrManagementEnum.Illegal_Argumnet_role);
@@ -275,7 +272,7 @@ public class EmployeeRepoDaoImpl implements EmployeeRepoDao {
 	    SqlParameterSource paramUpdate = new MapSqlParameterSource()
 	            .addValue("roleId", roleId)
 	            .addValue("status", 1)
-	            .addValue("employeeId", employee.getEmployeeId());
+	            .addValue("employeeId", employee.getEmployeeUuid());
 
 	    try {
 	        return template.update(sql, paramUpdate);

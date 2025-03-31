@@ -12,8 +12,8 @@ public class DepartmentRowMapper implements RowMapper<Departments> {
 	@Override
 	public Departments mapRow(ResultSet rs, int rowNum) throws SQLException {
 		Departments department = new Departments();
-		department.setTenantId(rs.getString("tenant_id"));
-		department.setDepartmentId(rs.getString("department_uuid"));
+		department.setTenantUuid(rs.getString("tenant_id"));
+		department.setDepartmentUuid(rs.getString("department_uuid"));
 		department.setDepartmentHeadId(rs.getString("department_head_uuid"));
 		department.setDepartmentName(rs.getString("department_name"));
 		department.setEmail(rs.getString("contact_email"));

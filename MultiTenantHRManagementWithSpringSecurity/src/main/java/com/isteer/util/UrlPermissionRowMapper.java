@@ -12,7 +12,7 @@ public class UrlPermissionRowMapper implements RowMapper<RequestPermisionDto> {
 	@Override
 	public RequestPermisionDto mapRow(ResultSet rs, int rowNum) throws SQLException {
 		RequestPermisionDto permission = new RequestPermisionDto();
-		permission.setRoleId(rs.getString("role_id"));
+		permission.setRoleUuid(rs.getString("role_id"));
 		permission.setUrlPattern(rs.getString("endpoint_id"));
 		return permission;
 	}
