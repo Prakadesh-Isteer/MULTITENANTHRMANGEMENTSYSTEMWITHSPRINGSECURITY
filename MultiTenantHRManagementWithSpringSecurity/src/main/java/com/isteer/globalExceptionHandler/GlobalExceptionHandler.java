@@ -12,6 +12,7 @@ import com.isteer.exception.InsertionFailedException;
 import com.isteer.exception.LeaveRequestNotFoundException;
 import com.isteer.exception.TenantIdNullException;
 import com.isteer.exception.EmployeeNotFoundException;
+
 import com.isteer.exception.DepartmentNotFoundException;
 
 @ControllerAdvice
@@ -180,14 +181,6 @@ public class GlobalExceptionHandler {
 		return invaildOperation;
 	}
 	
-	@ExceptionHandler(io.jsonwebtoken.ExpiredJwtException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ErrorMessageDto AuthorizationDeniedException (io.jsonwebtoken.ExpiredJwtException e) {
-		ErrorMessageDto invaildOperation = new ErrorMessageDto();
-		invaildOperation.setErrorCode(HrManagementEnum.TOKEN_EXPIRATION.getStatusCode());
-		invaildOperation.setErrorMessage(HrManagementEnum.TOKEN_EXPIRATION.getStatusMessage());
-		return invaildOperation;
-	}
 	
 	@ExceptionHandler(org.springframework.dao.EmptyResultDataAccessException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -198,12 +191,12 @@ public class GlobalExceptionHandler {
 		return invaildOperation;
 	}
 	
-	@ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+	@ExceptionHandler(com.isteer.exception.BadCredentialsException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ErrorMessageDto BadCredentialsException (org.springframework.security.authentication.BadCredentialsException e) {
+	public ErrorMessageDto BadCredentialsException (com.isteer.exception.BadCredentialsException e) {
 		ErrorMessageDto invaildOperation = new ErrorMessageDto();
-		invaildOperation.setErrorCode(HrManagementEnum.EMPTY_DATA_EXCEPTION.getStatusCode());
-		invaildOperation.setErrorMessage(HrManagementEnum.EMPTY_DATA_EXCEPTION.getStatusMessage());
+		invaildOperation.setErrorCode(HrManagementEnum.Bad_credentials_exception.getStatusCode());
+		invaildOperation.setErrorMessage(HrManagementEnum.Bad_credentials_exception.getStatusMessage());
 		return invaildOperation;
 	}
 	

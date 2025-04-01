@@ -96,22 +96,6 @@ public class AuthRepoImpl {
         return sts;
     }
 
-   
-//    // Get Role UUID by role_id (This is an optional method if you want to validate or check role_uuid before inserting)
-//    public String getRoleIdByUuid(String roleUuid) {
-//        String getRoleIdSQL = "SELECT role_uuid FROM roles WHERE role_uuid = :roleUuid LIMIT 1";
-//        
-//        MapSqlParameterSource params = new MapSqlParameterSource();
-//        params.addValue("roleUuid", roleUuid);
-//
-//        String roleId = namedParameterJdbcTemplate.queryForObject(getRoleIdSQL, params, String.class);
-//
-//        if (roleId == null) {
-//            throw new RoleIdNullException(HrManagementEnum.Role_id_null);
-//        }
-//        
-//        return roleId;
-//    }
-//    
+  
   
 }

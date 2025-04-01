@@ -5,8 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,8 +18,10 @@ import com.isteer.dto.ErrorMessageDto;
 import com.isteer.dto.JwtResponse;
 import com.isteer.dto.StatusMessageDto;
 import com.isteer.dto.UserDetailsDto;
+import com.isteer.entity.Employee;
 import com.isteer.enums.HrManagementEnum;
 import com.isteer.service.AuthService;
+import com.isteer.util.RedisService;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -25,17 +30,65 @@ public class AuthController {
 	@Autowired
 	AuthenticationManager manager;
  
-
     @Autowired
-      AuthService service;
+    AuthService service;
+    
+    @Autowired
+    RedisService redisService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDetailsDto users) {
     	String token = service.userLogin(users);
+    	String previousToken = redisService.getLatestToken(users.getUserName());
+    	
+    	if(previousToken != null) {
+    		redisService.removeToken(previousToken);
+    	}
+    	redisService.putUpdatedToken(users.getUserName(), token);
+    	
     	JwtResponse wrktoken = new JwtResponse(token);   
 		return ResponseEntity.ok(wrktoken);
     	   	
 }
+    
+    
+    @PreAuthorize("@authService.hasPermission()")
+	@GetMapping("/me")
+	public ResponseEntity<?> getUsersLoggedIn(String userId) {
+		Employee single = service.getuserByLogged(userId);
+		if(single == null) {
+			ErrorMessageDto error = new ErrorMessageDto(HrManagementEnum.NO_USERS_FOUND_LIST.getStatusCode(),
+					HrManagementEnum.NO_USERS_FOUND_LIST.getStatusMessage());
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
+		
+		}
+		return ResponseEntity.ok(single);
+	}
+    
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutMethod(@RequestHeader("Authorization") String authorizationToken) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (authorizationToken != null && authorizationToken.startsWith("Bearer ")) {
+            String token = authorizationToken.substring(7);
+            
+            if (token.equals(redisService.getLatestToken(userName))) {
+                redisService.removeToken(userName);
+                StatusMessageDto message = new StatusMessageDto(
+                        HrManagementEnum.LOGOUT_SUCCESS.getStatusCode(),
+                        HrManagementEnum.LOGOUT_SUCCESS.getStatusMessage());
+                return ResponseEntity.status(HttpStatus.OK).body(message);
+            }
+        }
+
+        ErrorMessageDto errorMessage = new ErrorMessageDto(
+                HrManagementEnum.LOGOUT_FAILED.getStatusCode(),
+                HrManagementEnum.LOGOUT_FAILED.getStatusMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    
+    
 	@PreAuthorize("@authService.hasPermission()")
     @PostMapping("/addUrl")
     public ResponseEntity<?> addUrl(@RequestParam String endpointUrl, @RequestParam String roleUuid) {

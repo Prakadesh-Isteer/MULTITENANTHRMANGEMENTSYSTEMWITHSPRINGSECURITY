@@ -6,35 +6,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.isteer.dto.ErrorMessageDto;
-import com.isteer.dto.JwtResponse;
 import com.isteer.dto.StatusMessageDto;
 import com.isteer.dto.UserDetailsDto;
 import com.isteer.entity.Employee;
 import com.isteer.entity.Roles;
 import com.isteer.enums.HrManagementEnum;
-import com.isteer.service.CustomerUserDetailsService;
 import com.isteer.service.HrManagementEmployeeService;
-import com.isteer.util.JwtUtil;
 
 import jakarta.validation.Valid;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 
 
@@ -93,11 +82,13 @@ public class HrManagementEmployeeController {
 		return ResponseEntity.ok(list) ;
 		
 	}
+	
+	
 	@PreAuthorize("@authService.hasPermission()")
-	@GetMapping("user")
-	public ResponseEntity<?> getUsersById(String userId) {
-		Employee single = service.getuserById(userId);
-		if(single == null) {
+	@GetMapping("/user")
+	public ResponseEntity<?> getUsersByEmployeeUuid(@RequestParam String employeeUuid) {
+		List<Employee> single = service.getAllUsersByEmployeeUuid(employeeUuid);
+		if(single.isEmpty()) {
 			ErrorMessageDto error = new ErrorMessageDto(HrManagementEnum.NO_USERS_FOUND_LIST.getStatusCode(),
 					HrManagementEnum.NO_USERS_FOUND_LIST.getStatusMessage());
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);

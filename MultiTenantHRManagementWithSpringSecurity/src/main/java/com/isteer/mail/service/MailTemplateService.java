@@ -370,7 +370,7 @@ public class MailTemplateService {
 
          System.out.println(userName);
          System.out.println(email);
-	     System.out.println(leaveType);
+	     System.out.println(leaveType);   
 	     System.out.println(startDate);
 	     System.out.println(endDate);
 	    

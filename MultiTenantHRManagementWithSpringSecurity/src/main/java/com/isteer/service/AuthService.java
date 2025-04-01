@@ -7,12 +7,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.isteer.dto.HttpMethodRoleRights;
 import com.isteer.dto.RequestPermisionDto;
 import com.isteer.dto.UserDetailsDto;
 import com.isteer.entity.Employee;
+import com.isteer.enums.HrManagementEnum;
+import com.isteer.exception.TenantIdNullException;
 import com.isteer.repository.AuthRepoImpl;
 import com.isteer.repository.EmployeeRepoDaoImpl;
 import com.isteer.util.JwtUtil;
@@ -29,7 +32,7 @@ public class AuthService {
 	HttpServletRequest request;
 	
 	@Autowired
-	EmployeeRepoDaoImpl repoData;
+	EmployeeRepoDaoImpl employeeRepoDaoImpl;
 	
 	@Autowired
 	AuthenticationManager authenticationManager;
@@ -47,7 +50,7 @@ public class AuthService {
 	    String httpMethod = request.getMethod();
 	    
 	    // Fetch user details based on username
-	    Employee user = repoData.findByUserName(userName);
+	    Employee user = employeeRepoDaoImpl.findByUserName(userName);
 	    System.out.println(user.getRoleUuid());
 	    System.out.println(url);
 	    
@@ -84,10 +87,19 @@ public class AuthService {
 
 	    return false;
 	}
+	
+    public Employee getuserByLogged(String userId){
+		
+		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+		Employee loggedInEmployee = employeeRepoDaoImpl.findByUserName(userName);
+
+		return loggedInEmployee;
+	
+	}
 
 	
 	public String userLogin(UserDetailsDto loginData) {
-		Employee wrkCredentials = repoData.findByUserName(loginData.getUserName());
+		Employee wrkCredentials = employeeRepoDaoImpl.findByUserName(loginData.getUserName());
 		System.out.println(loginData.getPassword());
 		System.out.println(loginData.getUserName());
 		try {
@@ -99,7 +111,7 @@ public class AuthService {
 			return token;
 		}
 		}catch(BadCredentialsException e){
-			e.printStackTrace();
+			throw new com.isteer.exception.BadCredentialsException(HrManagementEnum.Bad_credentials_exception);
 		}
 		return null;
 		}

@@ -71,7 +71,7 @@ public class HrManagementDepartmentController {
 	
 	@PreAuthorize("@authService.hasPermission()")
 	@GetMapping("/departments")
-	public ResponseEntity<?> getAllDepartments(@RequestParam String tenantUuid) {
+	public ResponseEntity<?> getAllDepartments(String tenantUuid) {
 	
 	List<?> list = service.getAllDepartments(tenantUuid);
 	

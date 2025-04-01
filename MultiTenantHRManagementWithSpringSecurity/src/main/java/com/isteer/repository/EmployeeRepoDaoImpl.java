@@ -130,22 +130,48 @@ public class EmployeeRepoDaoImpl implements EmployeeRepoDao {
 
 	}
 
+
+	
+	
 	@Transactional
-	@Override
 	public List<Employee> getAllUsers() {
-		String sql = "SELECT e.employee_uuid, e.role_id, e.tenant_id, e.department_id, e.userName, e.password, e.first_name, e.last_name, e.email, e.phone, e.address, e.date_of_joining, e.job_title FROM employee e JOIN departments d ON e.department_id = d.department_uuid JOIN tenants t ON e.tenant_id = t.tenant_uuid WHERE e.employee_status = :status AND d.department_status = 1 AND t.tenant_status = 1";
-		SqlParameterSource param = new MapSqlParameterSource().addValue("status", 1);
-		return template.query(sql, param, new EmployeeRowMapper());
+	    String sql = "SELECT e.employee_uuid, e.role_id, e.tenant_id, e.department_id, e.userName, e.password, e.first_name, e.last_name, e.email, e.phone, e.address, e.date_of_joining, e.job_title " +
+	                 "FROM employee e JOIN departments d ON e.department_id = d.department_uuid JOIN tenants t ON e.tenant_id = t.tenant_uuid " +
+	                 "WHERE e.employee_status = :status AND d.department_status = 1 AND t.tenant_status = 1";
+	    SqlParameterSource param = new MapSqlParameterSource().addValue("status", 1);
+	    return template.query(sql, param, new EmployeeRowMapper());
 	}
 
+	
+	@Transactional
+	public List<Employee> getEmployeesByTenant(String tenantUuid) {
+	    String sql = "SELECT e.employee_uuid, e.role_id, e.tenant_id, e.department_id, e.userName, e.password, e.first_name, e.last_name, e.email, e.phone, e.address, e.date_of_joining, e.job_title " +
+	                 "FROM employee e JOIN departments d ON e.department_id = d.department_uuid JOIN tenants t ON e.tenant_id = t.tenant_uuid " +
+	                 "WHERE e.employee_status = :status AND d.department_status = 1 AND t.tenant_status = 1 AND e.tenant_id = :tenantId";
+	    SqlParameterSource param = new MapSqlParameterSource().addValue("status", 1).addValue("tenantId", tenantUuid);
+	    return template.query(sql, param, new EmployeeRowMapper());
+	}
+
+	
+	@Transactional
+	public List<Employee> getEmployeesByDepartment(String departmentUuid) {
+	    String sql = "SELECT e.employee_uuid, e.role_id, e.tenant_id, e.department_id, e.userName, e.password, e.first_name, e.last_name, e.email, e.phone, e.address, e.date_of_joining, e.job_title " +
+	                 "FROM employee e JOIN departments d ON e.department_id = d.department_uuid JOIN tenants t ON e.tenant_id = t.tenant_uuid " +
+	                 "WHERE e.employee_status = :status AND d.department_status = 1 AND t.tenant_status = 1 AND e.department_id = :departmentId";
+	    SqlParameterSource param = new MapSqlParameterSource().addValue("status", 1).addValue("departmentId", departmentUuid);
+	    return template.query(sql, param, new EmployeeRowMapper());
+	}
+
+	
+
 	@Transactional
 
-	public List<Employee> getUsersById(String userId) {
-//		if (employeeId == null || employeeId.trim().isEmpty()) {
-//			throw new EmployeeIdNullException(HrManagementEnum.Employee_id_null);
-//		}
+	public List<Employee> getUsersById(String employeeUuid) {
+		if (employeeUuid == null || employeeUuid.trim().isEmpty()) {
+			throw new EmployeeIdNullException(HrManagementEnum.Employee_id_null);
+		}
 		String sql = "SELECT e.employee_uuid, e.role_id, e.tenant_id, e.department_id, e.userName, e.password, e.first_name, e.last_name, e.email, e.phone, e.address, e.date_of_joining, e.job_title FROM employee e JOIN departments d ON e.department_id = d.department_uuid JOIN tenants t ON e.tenant_id = t.tenant_uuid WHERE e.employee_status = :status AND  e.employee_uuid = :employeeId AND d.department_status = 1 AND t.tenant_status = 1";
-		SqlParameterSource param = new MapSqlParameterSource().addValue("status", 1).addValue("employeeId", userId);
+		SqlParameterSource param = new MapSqlParameterSource().addValue("status", 1).addValue("employeeId", employeeUuid);
 		return template.query(sql, param, new EmployeeRowMapper());
 
 	}

@@ -12,19 +12,20 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.isteer.dto.UserDetailsDto;
+import com.isteer.entity.Employee;
 
 public class UserPrincipal implements UserDetails {
 	
 	@Autowired
-	UserDetailsDto user;
+	Employee user;
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public UserPrincipal(UserDetailsDto user2) {
-		// TODO Auto-generated constructor stub
+	public UserPrincipal(Employee user2) {
+		this.user = user2;
 	}
 
 	@Override

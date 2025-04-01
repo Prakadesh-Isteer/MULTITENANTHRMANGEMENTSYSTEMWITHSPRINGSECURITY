@@ -130,17 +130,37 @@ public class DepartmentRepoDaoImpl implements DeapartmentRepoDao{
 	
 	@Transactional
 	@Override
-	public List<Departments> getAllDepartments(String tenantUuid){
-		if (tenantUuid == null || tenantUuid.trim().isEmpty()) {
-			throw new TenantIdNullException(HrManagementEnum.Tenant_id_null);
-		}
-		
-		String sql = "SELECT d.department_uuid, d.department_head_uuid, d.tenant_id, d.department_name, d.contact_email, d.contact_phone, d.description FROM departments d JOIN tenants t ON d.tenant_id = t.tenant_uuid WHERE d.department_status = :status AND t.tenant_status = 1  AND d.tenant_id = :tenantId";
-	 SqlParameterSource param = new MapSqlParameterSource()
-			 .addValue("status", 1)
-			 .addValue("tenantId", tenantUuid);
-	 return template.query(sql, param , new DepartmentRowMapper());
+	public List<Departments> getAllDepartmentsByTenants(String tenantUuid){
+		 // SQL query to fetch departments for a specific tenant where department status is active
+	    String sql = "SELECT d.department_uuid, d.department_head_uuid, d.tenant_id, d.department_name, " +
+	                 "d.contact_email, d.contact_phone, d.description " +
+	                 "FROM departments d " +
+	                 "JOIN tenants t ON d.tenant_id = t.tenant_uuid " +
+	                 "WHERE d.department_status = :status AND t.tenant_status = 1 " +
+	                 "AND d.tenant_id = :tenantId";
+
+	    // Parameters to inject into the query
+	    SqlParameterSource param = new MapSqlParameterSource()
+	                               .addValue("status", 1) // Only active departments
+	                               .addValue("tenantId", tenantUuid);
+
+	    // Execute the query and map the result to Department objects
+	    return template.query(sql, param, new DepartmentRowMapper());
+
 	}
+	
+	@Transactional
+	// Fetch all departments from all tenants
+	public List<Departments> getAllDepartments() {
+	    String sql = "SELECT d.department_uuid, d.department_head_uuid, d.tenant_id, d.department_name, " +
+	                 "d.contact_email, d.contact_phone, d.description " +
+	                 "FROM departments d " +
+	                 "WHERE d.department_status = :status";
+
+	    SqlParameterSource param = new MapSqlParameterSource().addValue("status", 1);  // Only active departments
+	    return template.query(sql, param, new DepartmentRowMapper());
+	}
+	
 	
 	@Transactional
 	@Override
