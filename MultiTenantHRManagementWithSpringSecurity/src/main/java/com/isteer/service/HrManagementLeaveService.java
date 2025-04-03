@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.isteer.dto.LeaveRequestDto;
 import com.isteer.entity.Employee;
 import com.isteer.entity.LeaveManagement;
+import com.isteer.enums.HrManagementEnum;
+import com.isteer.exception.DateBeforeInvaildException;
 import com.isteer.exception.EmployeeNotFoundException;
 import com.isteer.repository.EmployeeRepoDaoImpl;
 import com.isteer.repository.LeaveRepoDaoImpl;
@@ -43,7 +45,7 @@ public class HrManagementLeaveService {
 
 	    // Ensure the end date is not before the start date
 	    if (leaveRequestDto.getEndDate().isBefore(startDate)) {
-	        throw new IllegalArgumentException("End date cannot be before the start date.");
+         throw new DateBeforeInvaildException(HrManagementEnum.Date_Exception);
 	    }
 
 	    // Now we call the repository to apply the leave
@@ -55,11 +57,7 @@ public class HrManagementLeaveService {
 	    }
 	}
 
-	
-//	@Transactional
-//	public List<LeaveManagement> getAllLeaves() {
-//		return leaveRepoDaoImpl.getAllLeaves();
-//	}
+
 	
 	@Transactional
 	public List<LeaveManagement> getAllLeavesByStatus(String status) {
@@ -69,6 +67,8 @@ public class HrManagementLeaveService {
 	    
 	    // Get the department ID of the department head
 	    String departmentId = loggedInEmployee.getDepartmentUuid();
+	    
+	    
 	    
 	    // Pass the department ID and status to the repository layer to query leaves
 	    return leaveRepoDaoImpl.getAllLeavesByStatus(departmentId, status);

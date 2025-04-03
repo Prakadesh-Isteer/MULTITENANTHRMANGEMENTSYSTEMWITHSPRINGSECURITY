@@ -21,6 +21,8 @@ import com.isteer.dto.MailDto;
 import com.isteer.dto.StatusMessageDto;
 import com.isteer.entity.LeaveManagement;
 import com.isteer.enums.HrManagementEnum;
+import com.isteer.exception.InternalServerError;
+import com.isteer.exception.LeaveRequestNotFoundException;
 import com.isteer.mail.service.MailSenderService;
 import com.isteer.mail.service.MailTemplateService;
 import com.isteer.service.HrManagementLeaveService;
@@ -123,8 +125,8 @@ public class HrManagementLeaveRequestController {
 	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
 	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request");
+	     
+	       throw new LeaveRequestNotFoundException(HrManagementEnum.LEAVE_REQUEST_NOT_FOUND);
 	    }
 	}
 
@@ -152,8 +154,7 @@ public class HrManagementLeaveRequestController {
 	                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	            }
 	        } catch (Exception e) {
-	            e.printStackTrace();
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request");
+	        	  throw new LeaveRequestNotFoundException(HrManagementEnum.LEAVE_REQUEST_NOT_FOUND);
 	        }
 	    }
 	    
@@ -172,8 +173,8 @@ public class HrManagementLeaveRequestController {
 
 	            return ResponseEntity.status(HttpStatus.OK).body(leaveHistory);
 	        } catch (Exception e) {
-	            e.printStackTrace();
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching the leave history.");
+	          
+	            throw new InternalServerError(HrManagementEnum.INTERNAL_SERVER_ERROR);
 	        }
 	    }
 	 

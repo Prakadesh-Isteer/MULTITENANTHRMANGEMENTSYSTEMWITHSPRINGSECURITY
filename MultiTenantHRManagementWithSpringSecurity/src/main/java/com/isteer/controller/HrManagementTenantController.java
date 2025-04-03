@@ -60,7 +60,7 @@ public class HrManagementTenantController {
 
 	@PreAuthorize("@authService.hasPermission()")
 	@PutMapping("tenant")
-	public ResponseEntity<?> updateTenant(@Valid @RequestParam String tenantUuid, @RequestBody Tenants tenant) {
+	public ResponseEntity<?> updateTenant(@Valid @RequestParam String tenantUuid, @Valid @RequestBody Tenants tenant) {
 		tenant.setTenantUuid(tenantUuid);
 		// Ensure tenant object has the tenantId before calling the service method
 		int status = service.updateTenant(tenant);

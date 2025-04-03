@@ -18,8 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.isteer.exception.CustomAuthenticationEntryPoint;
-import com.isteer.service.CustomerUserDetailsService;
+//import com.isteer.exception.CustomAuthenticationEntryPoint;
+
 
 @Configuration
 @EnableWebSecurity
@@ -29,8 +29,8 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtAuthenticationFilter;
     
-   @Autowired
-   CustomAuthenticationEntryPoint  authenticationEntryPoint;
+//   @Autowired
+//   CustomAuthenticationEntryPoint  authenticationEntryPoint;
 
     @Autowired
     private UserDetailsService userDetailsService;  
@@ -44,8 +44,8 @@ public class SecurityConfig {
                 		.requestMatchers("/api/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(exception -> 
-                exception.authenticationEntryPoint(authenticationEntryPoint)) 
+//                .exceptionHandling(exception -> 
+//                exception.authenticationEntryPoint(authenticationEntryPoint)) 
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter,UsernamePasswordAuthenticationFilter.class)

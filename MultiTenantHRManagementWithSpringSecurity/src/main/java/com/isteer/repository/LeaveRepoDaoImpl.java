@@ -77,17 +77,26 @@ public class LeaveRepoDaoImpl implements LeaveRepoDao {
 	
 	
 	public List<LeaveManagement> getAllLeavesByStatus(String departmentId, String status) {
-	    String sql = "SELECT l.leave_uuid, l.employee_id, l.department_id, l.start_date, l.end_date, " +
-	                 "l.reason, l.status, l.applied_at, l.approved_or_rejected_by, l.approved_or_rejected_at " +
-	                 "FROM leaves l " +
-	                 "JOIN employee e ON l.employee_id = e.employee_uuid " +
-	                 "WHERE l.department_id = :departmentId " +
-	                 "AND l.status = :status " +
-	                 "AND e.department_id = :departmentId";
+//	    String sql = "SELECT l.leave_uuid, l.employee_id, l.department_id, l.start_date, l.end_date, " +
+//	                 "l.reason, l.status, l.applied_at, l.approved_or_rejected_by, l.approved_or_rejected_at " +
+//	                 "FROM leaves l " +
+//	                 "JOIN employee e ON l.employee_id = e.employee_uuid " +
+//	                 "WHERE l.department_id = :departmentId " +
+//	                 "AND l.status = :status " +
+//	                 "AND e.department_id = :departmentId";
+		
+		String sql = "SELECT l.leave_uuid, l.employee_id, l.department_id, l.start_date, l.end_date, " +
+	             "l.reason, l.status, l.applied_at, l.approved_or_rejected_by, l.approved_or_rejected_at " +
+	             "FROM leaves l " +
+	             "WHERE l.department_id = :departmentId " +
+	             "AND l.status = :status";
+
 
 	    SqlParameterSource param = new MapSqlParameterSource()
 	                               .addValue("departmentId", departmentId)
 	                               .addValue("status", status);
+	    System.out.println("Executing SQL: " + sql);
+	    System.out.println("Parameters: departmentId=" + departmentId + ", status=" + status);
 
 	    return template.query(sql, param, new LeaveRowMapper());
 	}

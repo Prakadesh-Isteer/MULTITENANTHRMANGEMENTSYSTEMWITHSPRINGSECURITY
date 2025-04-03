@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.isteer.dto.ErrorMessageDto;
 import com.isteer.enums.HrManagementEnum;
 import com.isteer.exception.InsertionFailedException;
+import com.isteer.exception.InternalServerError;
 import com.isteer.exception.LeaveRequestNotFoundException;
 import com.isteer.exception.TenantIdNullException;
 import com.isteer.exception.EmployeeNotFoundException;
-
+import com.isteer.exception.DateBeforeInvaildException;
 import com.isteer.exception.DepartmentNotFoundException;
 
 @ControllerAdvice
@@ -200,5 +201,22 @@ public class GlobalExceptionHandler {
 		return invaildOperation;
 	}
 	
+	@ExceptionHandler(InternalServerError.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorMessageDto InternalServerError (InternalServerError e) {
+		ErrorMessageDto invaildOperation = new ErrorMessageDto();
+		invaildOperation.setErrorCode(HrManagementEnum.INTERNAL_SERVER_ERROR.getStatusCode());
+		invaildOperation.setErrorMessage(HrManagementEnum.INTERNAL_SERVER_ERROR.getStatusMessage());
+		return invaildOperation;
+	}
+	
+	@ExceptionHandler(DateBeforeInvaildException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorMessageDto DateBeforeInvaildException (DateBeforeInvaildException e) {
+		ErrorMessageDto invaildOperation = new ErrorMessageDto();
+		invaildOperation.setErrorCode(HrManagementEnum.Date_Exception.getStatusCode());
+		invaildOperation.setErrorMessage(HrManagementEnum.Date_Exception.getStatusMessage());
+		return invaildOperation;
+	}
 	
 }

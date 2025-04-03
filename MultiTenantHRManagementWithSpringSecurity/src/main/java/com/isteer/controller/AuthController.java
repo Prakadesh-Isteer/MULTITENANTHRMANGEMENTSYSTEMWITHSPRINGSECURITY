@@ -21,7 +21,7 @@ import com.isteer.dto.UserDetailsDto;
 import com.isteer.entity.Employee;
 import com.isteer.enums.HrManagementEnum;
 import com.isteer.service.AuthService;
-import com.isteer.util.RedisService;
+import com.isteer.service.RedisService;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -52,7 +52,7 @@ public class AuthController {
 }
     
     
-    @PreAuthorize("@authService.hasPermission()")
+//    @PreAuthorize("@authService.hasPermission()")
 	@GetMapping("/me")
 	public ResponseEntity<?> getUsersLoggedIn(String userId) {
 		Employee single = service.getuserByLogged(userId);
