@@ -1,5 +1,7 @@
 package com.isteer.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,129 +28,133 @@ import com.isteer.service.RedisService;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    
+
+	public static Logger logging = LogManager.getLogger(AuthController.class);
+
 	@Autowired
 	AuthenticationManager manager;
- 
-    @Autowired
-    AuthService service;
-    
-    @Autowired
-    RedisService redisService;
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDetailsDto users) {
-    	String token = service.userLogin(users);
-    	String previousToken = redisService.getLatestToken(users.getUserName());
-    	
-    	if(previousToken != null) {
-    		redisService.removeToken(previousToken);
-    	}
-    	redisService.putUpdatedToken(users.getUserName(), token);
-    	
-    	JwtResponse wrktoken = new JwtResponse(token);   
+	@Autowired
+	AuthService service;
+
+	@Autowired
+	RedisService redisService;
+
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody UserDetailsDto users) {
+		logging.info("Attempting login for user: {}", users.getUserName());
+		String token = service.userLogin(users);
+		String previousToken = redisService.getLatestToken(users.getUserName());
+
+		if (previousToken != null) {
+			logging.info("Previous token found, removing it for user: {}", users.getUserName());
+			redisService.removeToken(previousToken);
+		}
+		redisService.putUpdatedToken(users.getUserName(), token);
+
+		JwtResponse wrktoken = new JwtResponse(token);
+		logging.info("Login successful for user: {}", users.getUserName());
 		return ResponseEntity.ok(wrktoken);
-    	   	
-}
-    
-    
+
+	}
+
 //    @PreAuthorize("@authService.hasPermission()")
 	@GetMapping("/me")
 	public ResponseEntity<?> getUsersLoggedIn(String userId) {
-		Employee single = service.getuserByLogged(userId);
-		if(single == null) {
+		logging.info("Fetching logged-in user details for userId: {}", userId);
+		Employee wrkUserName = service.getuserByLogged(userId);
+		if (wrkUserName == null) {
+			logging.warn("No user found with userId: {}", userId);
 			ErrorMessageDto error = new ErrorMessageDto(HrManagementEnum.NO_USERS_FOUND_LIST.getStatusCode(),
 					HrManagementEnum.NO_USERS_FOUND_LIST.getStatusMessage());
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(error);
-		
+
 		}
-		return ResponseEntity.ok(single);
+		logging.info("User found: {}", wrkUserName);
+		return ResponseEntity.ok(wrkUserName);
 	}
-    
-    @PostMapping("/logout")
-    public ResponseEntity<?> logoutMethod(@RequestHeader("Authorization") String authorizationToken) {
-        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        if (authorizationToken != null && authorizationToken.startsWith("Bearer ")) {
-            String token = authorizationToken.substring(7);
-            
-            if (token.equals(redisService.getLatestToken(userName))) {
-                redisService.removeToken(userName);
-                StatusMessageDto message = new StatusMessageDto(
-                        HrManagementEnum.LOGOUT_SUCCESS.getStatusCode(),
-                        HrManagementEnum.LOGOUT_SUCCESS.getStatusMessage());
-                return ResponseEntity.status(HttpStatus.OK).body(message);
-            }
-        }
+	@PostMapping("/logout")
+	public ResponseEntity<?> logoutMethod(@RequestHeader("Authorization") String authorizationToken) {
 
-        ErrorMessageDto errorMessage = new ErrorMessageDto(
-                HrManagementEnum.LOGOUT_FAILED.getStatusCode(),
-                HrManagementEnum.LOGOUT_FAILED.getStatusMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
-    }
+		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+		logging.info("Logging out user: {}", userName);
+		if (authorizationToken != null && authorizationToken.startsWith("Bearer ")) {
+			String token = authorizationToken.substring(7);
 
-    
-    
+			if (token.equals(redisService.getLatestToken(userName))) {
+				redisService.removeToken(userName);
+				StatusMessageDto message = new StatusMessageDto(HrManagementEnum.LOGOUT_SUCCESS.getStatusCode(),
+						HrManagementEnum.LOGOUT_SUCCESS.getStatusMessage());
+				logging.info("Logout successful for user: {}", userName);
+				return ResponseEntity.status(HttpStatus.OK).body(message);
+			}
+		}
+
+		ErrorMessageDto errorMessage = new ErrorMessageDto(HrManagementEnum.LOGOUT_FAILED.getStatusCode(),
+				HrManagementEnum.LOGOUT_FAILED.getStatusMessage());
+		logging.warn("Logout failed for user: {}", userName);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+	}
+
 	@PreAuthorize("@authService.hasPermission()")
-    @PostMapping("/addUrl")
-    public ResponseEntity<?> addUrl(@RequestParam String endpointUrl, @RequestParam String roleUuid) {
+	@PostMapping("/addUrl")
+	public ResponseEntity<?> addUrl(@RequestParam String endpointUrl, @RequestParam String roleUuid) {
+		logging.info("Adding endpoint URL: {} with role UUID: {}", endpointUrl, roleUuid);
 
-        try {
-            // Call the service method to add the endpoint and role mapping
-            int status = service.addEndpointWithRoleMapping(endpointUrl, roleUuid);
-            
-            // Return success response if the mapping is added successfully
-            if (status > 0) {
-                StatusMessageDto message = new StatusMessageDto(
-                        HrManagementEnum.END_POINT_CREATED.getStatusCode(),
-                        HrManagementEnum.END_POINT_CREATED.getStatusMessage());
-                return ResponseEntity.status(HttpStatus.OK).body(message);
-            }
-            
-            // Return failure response if adding mapping failed
-            ErrorMessageDto error = new ErrorMessageDto(
-                    HrManagementEnum.END_POINT_FAILED.getStatusCode(),
-                    HrManagementEnum.END_POINT_FAILED.getStatusMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-            
-        } catch (Exception e) {
-            // Catch any exception and return an error response
-            ErrorMessageDto error = new ErrorMessageDto(
-                    HrManagementEnum.END_POINT_FAILED.getStatusCode(),
-                    "Error adding endpoint: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-    }
-    
+		try {
+			logging.info(" Call the service method to add the endpoint and role mapping");
+			int status = service.addEndpointWithRoleMapping(endpointUrl, roleUuid);
+
+			if (status > 0) {
+				logging.info("Endpoint URL and role mapping added successfully.");
+				StatusMessageDto message = new StatusMessageDto(HrManagementEnum.END_POINT_CREATED.getStatusCode(),
+						HrManagementEnum.END_POINT_CREATED.getStatusMessage());
+				return ResponseEntity.status(HttpStatus.OK).body(message);
+			}
+
+			ErrorMessageDto error = new ErrorMessageDto(HrManagementEnum.END_POINT_FAILED.getStatusCode(),
+					HrManagementEnum.END_POINT_FAILED.getStatusMessage());
+			logging.error("Failed to add endpoint URL and role mapping.");
+
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+
+		} catch (Exception e) {
+			ErrorMessageDto error = new ErrorMessageDto(HrManagementEnum.END_POINT_FAILED.getStatusCode(),
+			  e.getMessage());
+			logging.error("Error occurred while adding endpoint URL and role mapping: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+		}
+	}
+
 	@PreAuthorize("@authService.hasPermission()")
- // Endpoint to map HTTP method to role using UUID
-    @PostMapping("/addHttpMethod")
-    public ResponseEntity<?> addHttpMethodMapping(@RequestParam String httpMethod, @RequestParam String roleUuid) {
-        try {
-            // Call service method to add the HTTP method mapping
-            int status = service.addHttpMethodMapping(httpMethod,roleUuid);
+	@PostMapping("/addHttpMethod")
+	public ResponseEntity<?> addHttpMethodMapping(@RequestParam String httpMethod, @RequestParam String roleUuid) {
+		logging.info("Mapping HTTP method: {} with role UUID: {}", httpMethod, roleUuid);
+		try {
 
-            if (status > 0) {
-                StatusMessageDto successMessage = new StatusMessageDto(
-                        HrManagementEnum.METHOD_MAPPING_SUCCESS.getStatusCode(),
-                        HrManagementEnum.METHOD_MAPPING_SUCCESS.getStatusMessage());
-                return ResponseEntity.status(HttpStatus.OK).body(successMessage);
-            } else {
-                ErrorMessageDto errorMessage = new ErrorMessageDto(
-                        HrManagementEnum.METHOD_MAPPING_FAIL.getStatusCode(),
-                        HrManagementEnum.METHOD_MAPPING_FAIL.getStatusMessage());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
-            }
+			int status = service.addHttpMethodMapping(httpMethod, roleUuid);
 
-        } catch (Exception e) {
-            // Handle any exception that occurs
-        	e.printStackTrace();
-            ErrorMessageDto errorMessage = new ErrorMessageDto(
-                    HrManagementEnum.METHOD_MAPPING_FAIL.getStatusCode(),
-                    "Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
-        }
-    }
-    
-    
+			if (status > 0) {
+				logging.info("HTTP method mapping added successfully.");
+				StatusMessageDto successMessage = new StatusMessageDto(
+						HrManagementEnum.METHOD_MAPPING_SUCCESS.getStatusCode(),
+						HrManagementEnum.METHOD_MAPPING_SUCCESS.getStatusMessage());
+				return ResponseEntity.status(HttpStatus.OK).body(successMessage);
+			} else {
+				logging.error("Failed to add HTTP method mapping.");
+
+				ErrorMessageDto errorMessage = new ErrorMessageDto(HrManagementEnum.METHOD_MAPPING_FAIL.getStatusCode(),
+						HrManagementEnum.METHOD_MAPPING_FAIL.getStatusMessage());
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+			}
+
+		} catch (Exception e) {
+			logging.error("Error occurred while adding HTTP method mapping: {}", e.getMessage());
+			ErrorMessageDto errorMessage = new ErrorMessageDto(HrManagementEnum.METHOD_MAPPING_FAIL.getStatusCode(),
+					"Error: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+		}
+	}
+
 }

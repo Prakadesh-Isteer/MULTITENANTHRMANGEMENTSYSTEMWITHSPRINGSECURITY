@@ -21,8 +21,9 @@ public interface EmployeeRepoDao {
 	public int deleteEmployee(String employeeId);
 	
 	public List<Roles> getAllAvailableRoles();
+	public List<Employee> getEmployeesByTenant(String tenantUuid);
 	
-
+	public List<Employee> getEmployeesByDepartment(String departmentUuid);
 	public int updateUserRole(String employeeId, String roleId);
 	
 }

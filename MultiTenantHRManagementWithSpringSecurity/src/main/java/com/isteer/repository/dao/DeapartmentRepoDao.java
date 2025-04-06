@@ -14,4 +14,5 @@ public interface DeapartmentRepoDao {
 	public List<Departments> getAllDepartmentsByTenants(String tenantId);
 	public int deleteDepartment(String departmentId) ;
 	public List<Employee> getAllEmployeesByDepartment(String departmentId);
+	public List<Departments> getAllDepartments();
 }

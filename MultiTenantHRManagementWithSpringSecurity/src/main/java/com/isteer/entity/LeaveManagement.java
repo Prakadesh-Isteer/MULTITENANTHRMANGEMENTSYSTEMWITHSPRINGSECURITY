@@ -1,8 +1,11 @@
 package com.isteer.entity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.springframework.stereotype.Component;
+
+import jakarta.validation.constraints.NotNull;
 
 @Component
 public class LeaveManagement {
@@ -11,10 +14,12 @@ public class LeaveManagement {
     private String employeeUuid;
     private String departmentUuid;
     private Date startDate;
+    @NotNull(message = "END DATE CANNOT BE NULL")
     private Date endDate;
+    @NotNull(message = "REASON CANNOT BE NULL")
     private String reason;
     private String status;
-    private Date appliedAt;
+    private LocalDateTime appliedAt;
     private String approvedBy;
     private Date approvedAt;
 
@@ -62,12 +67,7 @@ public class LeaveManagement {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public Date getAppliedAt() {
-		return appliedAt;
-	}
-	public void setAppliedAt(Date appliedAt) {
-		this.appliedAt = appliedAt;
-	}
+	
 	public String getApprovedBy() {
 		return approvedBy;
 	}
@@ -79,6 +79,12 @@ public class LeaveManagement {
 	}
 	public void setApprovedAt(Date approvedAt) {
 		this.approvedAt = approvedAt;
+	}
+	public LocalDateTime getAppliedAt() {
+		return appliedAt;
+	}
+	public void setAppliedAt(LocalDateTime appliedAt) {
+		this.appliedAt = appliedAt;
 	}
 	
 

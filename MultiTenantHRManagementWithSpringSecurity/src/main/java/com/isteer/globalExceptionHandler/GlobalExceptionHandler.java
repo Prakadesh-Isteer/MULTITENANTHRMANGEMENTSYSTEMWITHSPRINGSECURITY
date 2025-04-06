@@ -1,6 +1,7 @@
 package com.isteer.globalExceptionHandler;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -11,9 +12,13 @@ import com.isteer.enums.HrManagementEnum;
 import com.isteer.exception.InsertionFailedException;
 import com.isteer.exception.InternalServerError;
 import com.isteer.exception.LeaveRequestNotFoundException;
+import com.isteer.exception.LeaveRequestNullException;
+import com.isteer.exception.MailTriggerException;
 import com.isteer.exception.TenantIdNullException;
 import com.isteer.exception.EmployeeNotFoundException;
+import com.isteer.exception.EndpointNullException;
 import com.isteer.exception.DateBeforeInvaildException;
+import com.isteer.exception.DateTooFarInFutureException;
 import com.isteer.exception.DepartmentNotFoundException;
 
 @ControllerAdvice
@@ -22,12 +27,12 @@ import com.isteer.exception.DepartmentNotFoundException;
 public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(Exception.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ErrorMessageDto  Exception(Exception e) {
 		ErrorMessageDto invaildOperation = new ErrorMessageDto();
 		invaildOperation.setErrorCode(9888);
 		invaildOperation.setErrorMessage(e.getMessage());
-		e.printStackTrace();
+//		e.printStackTrace();
 		return invaildOperation;
 	}
 	@ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
@@ -43,8 +48,8 @@ public class GlobalExceptionHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorMessageDto TenantIdNullException(TenantIdNullException e) {
      ErrorMessageDto invaildOperation = new ErrorMessageDto();
-		invaildOperation.setErrorCode(HrManagementEnum.Tenant_id_null.getStatusCode());
-		invaildOperation.setErrorMessage(HrManagementEnum.Tenant_id_null.getStatusMessage());
+		invaildOperation.setErrorCode(e.getError().getStatusCode());
+		invaildOperation.setErrorMessage(e.getError().getStatusMessage());
 		return invaildOperation;
 	}
 	
@@ -155,6 +160,16 @@ public class GlobalExceptionHandler {
 		return invaildOperation;
 	}
 	
+	@ExceptionHandler(LeaveRequestNullException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorMessageDto LeaveRequestNullException(LeaveRequestNullException e) {
+     ErrorMessageDto invaildOperation = new ErrorMessageDto();
+		invaildOperation.setErrorCode(HrManagementEnum.Leave_id_null.getStatusCode());
+		invaildOperation.setErrorMessage(HrManagementEnum.Leave_id_null.getStatusMessage());
+		return invaildOperation;
+	}
+	
+	
 	@ExceptionHandler(io.jsonwebtoken.security.SignatureException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorMessageDto SignatureException(io.jsonwebtoken.security.SignatureException e) {
@@ -218,5 +233,40 @@ public class GlobalExceptionHandler {
 		invaildOperation.setErrorMessage(HrManagementEnum.Date_Exception.getStatusMessage());
 		return invaildOperation;
 	}
+	
+	@ExceptionHandler(DateTooFarInFutureException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorMessageDto DateTooFarInFutureException (DateTooFarInFutureException e) {
+		ErrorMessageDto invaildOperation = new ErrorMessageDto();
+		invaildOperation.setErrorCode(HrManagementEnum.Date_Future_exception.getStatusCode());
+		invaildOperation.setErrorMessage(HrManagementEnum.Date_Future_exception.getStatusMessage());
+		return invaildOperation;
+	}
+	
+	@ExceptionHandler(EndpointNullException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorMessageDto  EndpointNullException(EndpointNullException e) {
+		ErrorMessageDto invaildOperation = new ErrorMessageDto();
+		invaildOperation.setErrorCode(HrManagementEnum.End_point_null.getStatusCode());
+		invaildOperation.setErrorMessage(HrManagementEnum.End_point_null.getStatusMessage());
+		return invaildOperation;
+	}
+	
+	@ExceptionHandler(com.isteer.exception.RoleIdNotFoundException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorMessageDto RoleIdNotFoundException(com.isteer.exception.RoleIdNotFoundException e) {
+		ErrorMessageDto invaildOperation = new ErrorMessageDto();
+		invaildOperation.setErrorCode(HrManagementEnum.Illegal_Argumnet_role.getStatusCode());
+		invaildOperation.setErrorMessage(HrManagementEnum.Illegal_Argumnet_role.getStatusMessage());
+		return invaildOperation;
+	}
+	
+	@ExceptionHandler(MailTriggerException.class)
+	public ResponseEntity<?> MailTriggerException(MailTriggerException e){
+		HrManagementEnum errorCode = e.getError();
+		ErrorMessageDto invaildOperation = new ErrorMessageDto(errorCode.getStatusCode(),errorCode.getStatusMessage());
+		return new ResponseEntity<>(invaildOperation, HttpStatus.BAD_REQUEST);
+	}
+	
 	
 }

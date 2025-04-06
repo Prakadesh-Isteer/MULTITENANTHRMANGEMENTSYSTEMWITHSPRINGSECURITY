@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,138 +32,155 @@ public class MailTemplateService {
 
 	public String buildLeaveApprovalEmail(MailDto contents) {
 		
-				
-		String mailTemplate = "<!DOCTYPE html>" +
-			    "<html lang=\"en\">" +
-			    "<head>" +
-			    "    <meta charset=\"UTF-8\">" +
-			    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-			    "    <title>Leave Approval Notification</title>" +
-			    "    <style>" +
-			    "        /* Base styles */" +
-			    "        body {" +
-			    "            font-family: 'Arial', sans-serif;" +
-			    "            margin: 0;" +
-			    "            padding: 0;" +
-			    "            background-color: #f4f4f4;" +
-			    "            color: #333333;" +
-			    "        }" +
-			    "        table {" +
-			    "            width: 100%;" +
-			    "            padding: 20px 0;" +
-			    "        }" +
-			    "        /* Center the email container */" +
-			    "        .email-container {" +
-			    "            max-width: 600px;" +
-			    "            margin: 0 auto;" +
-			    "            background-color: #ffffff;" +
-			    "            border-radius: 8px;" +
-			    "            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" +
-			    "            animation: fadeIn 1s ease-in;" +
-			    "        }" +
-			    "        /* Header styles */" +
-			    "        .email-header {" +
-			    "            background-color: #2C3E50;" +
-			    "            color: #F39C12;" +
-			    "            text-align: center;" +
-			    "            padding: 20px;" +
-			    "            border-top-left-radius: 8px;" +
-			    "            border-top-right-radius: 8px;" +
-			    "        }" +
-			    "        .email-header h2 {" +
-			    "            margin: 0;" +
-			    "            font-size: 28px;" +
-			    "            font-weight: 600;" +
-			    "        }" +
-			    "        /* Content Styles */" +
-			    "        .email-content {" +
-			    "            padding: 20px;" +
-			    "            font-size: 16px;" +
-			    "            color: #555555;" +
-			    "            line-height: 1.6;" +
-			    "        }" +
-			    "        .email-content p {" +
-			    "            margin: 0 0 10px;" +
-			    "        }" +
-			    "        .details-table td {" +
-			    "            padding: 12px;" +
-			    "            background-color: #ECF0F1;" +
-			    "            border: 1px solid #BDC3C7;" +
-			    "            text-align: left;" +
-			    "        }" +
-			    "        .details-table td strong {" +
-			    "            color: #2C3E50;" +
-			    "        }" +
-			    "        /* Footer styles */" +
-			    "        .email-footer {" +
-			    "            background-color: #2C3E50;" +
-			    "            color: #BDC3C7;" +
-			    "            text-align: center;" +
-			    "            padding: 20px;" +
-			    "            font-size: 12px;" +
-			    "            border-bottom-left-radius: 8px;" +
-			    "            border-bottom-right-radius: 8px;" +
-			    "        }" +
-			    "        /* Button hover effect */" +
-			    "        .btn {" +
-			    "            background-color: #F39C12;" +
-			    "            color: white;" +
-			    "            padding: 10px 20px;" +
-			    "            text-align: center;" +
-			    "            border-radius: 4px;" +
-			    "            text-decoration: none;" +
-			    "            display: inline-block;" +
-			    "            transition: background-color 0.3s ease;" +
-			    "        }" +
-			    "        .btn:hover {" +
-			    "            background-color: #D35400;" +
-			    "        }" +
-			    "        /* Fade-in animation */" +
-			    "        @keyframes fadeIn {" +
-			    "            0% { opacity: 0; }" +
-			    "            100% { opacity: 1; }" +
-			    "        }" +
-			    "    </style>" +
-			    "</head>" +
-			    "<body>" +
-			    "    <table>" +
-			    "        <tr>" +
-			    "            <td align=\"center\">" +
-			    "                <div class=\"email-container\">" +
-			    "                    <div class=\"email-header\">" +
-			    "                        <h2>Leave Approval Notification</h2>" +
-			    "                    </div>" +
-			    "                    <div class=\"email-content\">" +
-			    "                        <p>Dear <strong>" + contents.getFirstName() + " " + contents.getLastName() + "</strong>,</p>" +
-			    "                        <p>We are pleased to inform you that your leave request has been approved. Below are the details of your leave:</p>" +
-			    "                        <table class=\"details-table\" width=\"100%\" cellpadding=\"5\" cellspacing=\"0\">" +
-			    "                            <tr>" +
-			    "                                <td><strong>Leave Type:</strong></td>" +
-			    "                                <td>" + contents.getLeaveType() + "</td>" +
-			    "                            </tr>" +
-			    "                            <tr>" +
-			    "                                <td><strong>Start Date:</strong></td>" +
-			    "                                <td>" + contents.getStartDate() + "</td>" +
-			    "                            </tr>" +
-			    "                            <tr>" +
-			    "                                <td><strong>End Date:</strong></td>" +
-			    "                                <td>" + contents.getEndDate() + "</td>" +
-			    "                            </tr>" +
-			    "                        </table>" +
-			    "                        <p>If you have any questions or concerns, feel free to contact HR.</p>" +
-			    "                        <p>Regards,</p>" +
-			    "                        <p>HR Team</p>" +
-			    "                        <a href=\"https://www.linkedin.com/in/anil-kumar-a525337\" class=\"btn\">Contact HR</a>" +
-			    "                    </div>" +
-			    "                    <div class=\"email-footer\">" +
-			    "                        <p>&copy; 2025 MultiTenantHRManagement. All Rights Reserved.</p>" +
-			    "                    </div>" +
-			    "                </div>" +
-			    "            </td>" +
-			    "        </tr>" +
-			    "    </table>" +
-			    "</body>" +
-			    "</html>";
+	String mailTemplate = "<!DOCTYPE html>" +
+	    "<html lang=\"en\">" +
+	    "<head>" +
+	    "    <meta charset=\"UTF-8\">" +
+	    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+	    "    <title>Leave Approval Notification</title>" +
+	    "    <style>" +
+	    "        /* Base styles */" +
+	    "        body {" +
+	    "            font-family: 'Arial', sans-serif;" +
+	    "            margin: 0;" +
+	    "            padding: 0;" +
+	    "            background-color: #f4f4f4;" +
+	    "            color: #333333;" +
+	    "        }" +
+	    "        table {" +
+	    "            width: 100%;" +
+	    "            padding: 20px 0;" +
+	    "        }" +
+	    "        /* Center the email container */" +
+	    "        .email-container {" +
+	    "            max-width: 600px;" +
+	    "            margin: 0 auto;" +
+	    "            background-color: #ffffff;" +
+	    "            border-radius: 8px;" +
+	    "            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);" +
+	    "            animation: fadeIn 1s ease-in;" +
+	    "        }" +
+	    "        /* Header styles */" +
+	    "        .email-header {" +
+	    "            background-color: #2C3E50;" +
+	    "            color: #F39C12;" +
+	    "            text-align: center;" +
+	    "            padding: 20px;" +
+	    "            border-top-left-radius: 8px;" +
+	    "            border-top-right-radius: 8px;" +
+	    "        }" +
+	    "        .email-header h2 {" +
+	    "            margin: 0;" +
+	    "            font-size: 28px;" +
+	    "            font-weight: 600;" +
+	    "        }" +
+	    "        /* Content Styles */" +
+	    "        .email-content {" +
+	    "            padding: 20px;" +
+	    "            font-size: 16px;" +
+	    "            color: #555555;" +
+	    "            line-height: 1.6;" +
+	    "        }" +
+	    "        .email-content p {" +
+	    "            margin: 0 0 10px;" +
+	    "        }" +
+	    "        .details-table td {" +
+	    "            padding: 12px;" +
+	    "            background-color: #ECF0F1;" +
+	    "            border: 1px solid #BDC3C7;" +
+	    "            text-align: left;" +
+	    "        }" +
+	    "        .details-table td strong {" +
+	    "            color: #2C3E50;" +
+	    "        }" +
+	    "        /* Footer styles */" +
+	    "        .email-footer {" +
+	    "            background-color: #2C3E50;" +
+	    "            color: #BDC3C7;" +
+	    "            text-align: center;" +
+	    "            padding: 20px;" +
+	    "            font-size: 12px;" +
+	    "            border-bottom-left-radius: 8px;" +
+	    "            border-bottom-right-radius: 8px;" +
+	    "        }" +
+	    "        /* Button hover effect */" +
+	    "        .btn {" +
+	    "            background-color: #F39C12;" +
+	    "            color: white;" +
+	    "            padding: 10px 20px;" +
+	    "            text-align: center;" +
+	    "            border-radius: 4px;" +
+	    "            text-decoration: none;" +
+	    "            display: inline-block;" +
+	    "            transition: background-color 0.3s ease;" +
+	    "        }" +
+	    "        .btn:hover {" +
+	    "            background-color: #D35400;" +
+	    "        }" +
+	    "        /* Fade-in animation */" +
+	    "        @keyframes fadeIn {" +
+	    "            0% { opacity: 0; }" +
+	    "            100% { opacity: 1; }" +
+	    "        }" +
+
+	    "        /* Remove any color change when the link is clicked or visited */" +
+	    "        a.btn {" +
+	    "            color: #FFFFFF; /* Set the desired color for the link (e.g., violet) */" +
+	    "            text-decoration: none; /* Optional: Remove underline if you don't want it */" +
+	    "        }" +
+	    "        /* Optional: Define a hover state to maintain the same color */" +
+	    "        a.btn:hover {" +
+	    "            color: #FFFFFF; /* Keep the same color when hovering over the link */" +
+	    "        }" +
+	    "        /* Optional: Define an active state to prevent color change when clicked */" +
+	    "        a.btn:active {" +
+	    "            color:#FFFFFF; /* Keep the same color when the link is clicked */" +
+	    "        }" +
+	    "        /* Prevent the link from changing color after it's visited */" +
+	    "        a.btn:visited {" +
+	    "            color: #FFFFFF; /* Keep the same color after the link is visited */" +
+	    "        }" +
+	    "    </style>" +
+	    "</head>" +
+	    "<body>" +
+	    "    <table>" +
+	    "        <tr>" +
+	    "            <td align=\"center\">" +
+	    "                <div class=\"email-container\">" +
+	    "                    <div class=\"email-header\">" +
+	    "                        <h2>Leave Approval Notification</h2>" +
+	    "                    </div>" +
+	    "                    <div class=\"email-content\">" +
+	    "                        <p>Dear <strong>" + contents.getFirstName() + " " + contents.getLastName() + "</strong>,</p>" +
+	    "                        <p>We are pleased to inform you that your leave request has been approved. Below are the details of your leave:</p>" +
+	    "                        <table class=\"details-table\" width=\"100%\" cellpadding=\"5\" cellspacing=\"0\">" +
+	    "                            <tr>" +
+	    "                                <td><strong>Leave Type:</strong></td>" +
+	    "                                <td>" + contents.getLeaveType() + "</td>" +
+	    "                            </tr>" +
+	    "                            <tr>" +
+	    "                                <td><strong>Start Date:</strong></td>" +
+	    "                                <td>" + contents.getStartDate() + "</td>" +
+	    "                            </tr>" +
+	    "                            <tr>" +
+	    "                                <td><strong>End Date:</strong></td>" +
+	    "                                <td>" + contents.getEndDate() + "</td>" +
+	    "                            </tr>" +
+	    "                        </table>" +
+	    "                        <p>If you have any questions or concerns, feel free to contact HR.</p>" +
+	    "                        <p>Regards,</p>" +
+	    "                        <p>HR Team</p>" +
+	    "                        <a href=\"https://www.linkedin.com/in/anil-kumar-a525337\" class=\"btn\">Contact HR</a>" +
+	    "                    </div>" +
+	    "                    <div class=\"email-footer\">" +
+	    "                        <p>&copy; 2025 MultiTenantHRManagement. All Rights Reserved.</p>" +
+	    "                    </div>" +
+	    "                </div>" +
+	    "            </td>" +
+	    "        </tr>" +
+	    "    </table>" +
+	    "</body>" +
+	    "</html>";
 
 		return mailTemplate;
 
@@ -262,6 +278,25 @@ public class MailTemplateService {
 			    "        @keyframes fadeIn {" +
 			    "            0% { opacity: 0; }" +
 			    "            100% { opacity: 1; }" +
+			    "        }" +
+			    
+
+			    "        /* Remove any color change when the link is clicked or visited */" +
+			    "        a.btn {" +
+			    "            color: #FFFFFF; /* Set the desired color for the link (e.g., violet) */" +
+			    "            text-decoration: none; /* Optional: Remove underline if you don't want it */" +
+			    "        }" +
+			    "        /* Optional: Define a hover state to maintain the same color */" +
+			    "        a.btn:hover {" +
+			    "            color: #FFFFFF; /* Keep the same color when hovering over the link */" +
+			    "        }" +
+			    "        /* Optional: Define an active state to prevent color change when clicked */" +
+			    "        a.btn:active {" +
+			    "            color: #FFFFFF; /* Keep the same color when the link is clicked */" +
+			    "        }" +
+			    "        /* Prevent the link from changing color after it's visited */" +
+			    "        a.btn:visited {" +
+			    "            color: #FFFFFF; /* Keep the same color after the link is visited */" +
 			    "        }" +
 			    "    </style>" +
 			    "</head>" +

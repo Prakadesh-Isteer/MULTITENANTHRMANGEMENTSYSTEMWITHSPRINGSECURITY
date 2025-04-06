@@ -19,8 +19,7 @@ public class MultiTenantHrManagementApplication implements CommandLineRunner {
 		// TODO Auto-generated method stub
 		logging.info("Application is starting");
 		logging.warn("While application gets Started, User should be alret for performing the operations");
-			
-		
+					
 	}
 
 }

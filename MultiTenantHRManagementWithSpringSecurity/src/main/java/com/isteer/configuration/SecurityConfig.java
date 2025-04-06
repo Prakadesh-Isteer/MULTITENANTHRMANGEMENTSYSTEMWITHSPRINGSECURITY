@@ -1,6 +1,9 @@
 package com.isteer.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,7 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-//import com.isteer.exception.CustomAuthenticationEntryPoint;
 
 
 @Configuration
@@ -29,24 +31,24 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtAuthenticationFilter;
     
-//   @Autowired
-//   CustomAuthenticationEntryPoint  authenticationEntryPoint;
 
     @Autowired
     private UserDetailsService userDetailsService;  
 
+    private static final Logger logging = LogManager.getLogger(SecurityConfig.class);
+    
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    	 System.out.println("filterchain...............................................");
+    	  logging.info("Configuring HTTP security for the application...");
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                 		.requestMatchers("/api/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )
-//                .exceptionHandling(exception -> 
-//                exception.authenticationEntryPoint(authenticationEntryPoint)) 
+                
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter,UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -55,22 +57,23 @@ public class SecurityConfig {
 
     @Bean
      AuthenticationProvider authenticationProvider() {
-    	System.out.println("auth provider..................................");
+    	 logging.info("Configuring authentication provider...");
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder());
         provider.setUserDetailsService(userDetailsService);
+        logging.info("Authentication provider configured successfully.");
         return provider;
     }
     
-    
- // AuthenticationManager Bean (Required for authentication in JWT filter)
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    	 logging.info("Authentication Manager configured successfully.");
     	return config.getAuthenticationManager();
     }
 
     @Bean
     PasswordEncoder passwordEncoder() {
+    	 logging.info("Password encoder configured successfully.");
         return new BCryptPasswordEncoder();
     }
 }
