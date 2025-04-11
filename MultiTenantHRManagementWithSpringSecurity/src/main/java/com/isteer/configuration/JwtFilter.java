@@ -92,6 +92,7 @@ public class JwtFilter extends OncePerRequestFilter {
 			response.getWriter().flush();
 			return;
 		}catch(MalformedJwtException e) {
+			
 			 logging.error("JWT token Malformed for username: {}. Error: {}", username, e.getMessage());
 
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

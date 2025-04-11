@@ -65,15 +65,18 @@ public class SecurityConfig {
         return provider;
     }
     
+    
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
     	 logging.info("Authentication Manager configured successfully.");
     	return config.getAuthenticationManager();
     }
 
+    
     @Bean
     PasswordEncoder passwordEncoder() {
     	 logging.info("Password encoder configured successfully.");
         return new BCryptPasswordEncoder();
     }
+    
 }

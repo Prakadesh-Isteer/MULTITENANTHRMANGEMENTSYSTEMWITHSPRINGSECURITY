@@ -2,6 +2,8 @@ package com.isteer.entity;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.validation.constraints.NotBlank;
 
 @Component
@@ -9,12 +11,15 @@ public class Employee {
 	
 	private String employeeUuid;
 	private String roleUuid;
+
 	@NotBlank(message = "TENANT ID FIELD CANNOT BE EMPTY")
 	private String tenantUuid;
+
 	@NotBlank(message = "DEPARTMENT ID FIELD CANNOT BE EMPTY")
 	private String departmentUuid;
 	@NotBlank(message = "USERNAME FIELD CANNOT BE EMPTY")
 	private String userName;
+	@JsonIgnore
 	@NotBlank(message = "PASSWORD FIELD CANNOT BE EMPTY")
 	private String password;
 	@NotBlank(message = "FIRST NAME FIELD CANNOT BE EMPTY")

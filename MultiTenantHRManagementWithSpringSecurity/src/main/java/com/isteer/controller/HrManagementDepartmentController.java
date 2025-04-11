@@ -26,8 +26,6 @@ import com.isteer.service.HrManagementDepartmentService;
 import jakarta.validation.Valid;
 
 
-
-
 @RequestMapping("/hrManagement")
 @RestController
 public class HrManagementDepartmentController {

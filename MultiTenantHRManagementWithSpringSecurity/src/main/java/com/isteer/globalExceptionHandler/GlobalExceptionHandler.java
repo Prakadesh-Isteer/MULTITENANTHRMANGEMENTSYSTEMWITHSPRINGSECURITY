@@ -199,7 +199,7 @@ public class GlobalExceptionHandler {
 	
 	
 	@ExceptionHandler(org.springframework.dao.EmptyResultDataAccessException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	public ErrorMessageDto EmptyResultDataAccessException (org.springframework.dao.EmptyResultDataAccessException e) {
 		ErrorMessageDto invaildOperation = new ErrorMessageDto();
 		invaildOperation.setErrorCode(HrManagementEnum.EMPTY_DATA_EXCEPTION.getStatusCode());

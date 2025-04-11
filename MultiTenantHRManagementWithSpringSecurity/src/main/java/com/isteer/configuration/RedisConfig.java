@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 @Configuration
 @EnableCaching
 public class RedisConfig {
+	
 	private static final Logger logging = LogManager.getLogger(RedisConfig.class);
 	
 	@Bean
@@ -37,12 +38,14 @@ public class RedisConfig {
 	
 	@Bean
 	RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory){
-		 logging.info("Configuring Redis Template...");
+		
+		logging.info("Configuring Redis Template...");
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(connectionFactory);
 		template.setKeySerializer(new StringRedisSerializer());
 		template.setValueSerializer(new GenericToStringSerializer<>(Object.class));
 		return template;
+		
 	}
 	
 	

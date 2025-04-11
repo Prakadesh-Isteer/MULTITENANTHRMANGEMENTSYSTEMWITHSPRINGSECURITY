@@ -37,8 +37,7 @@ public class HrManagementEmployeeService {
 
 	             throw new DepartmentIdNullException(HrManagementEnum.Department_id_null);
 	         }
-	        // Encode the password for each user in the list
-	            // Encoding the password using BCryptPasswordEncoder
+	        
 	            details.setPassword(passwordEncoder.encode(details.getPassword()));
 	            logger.info("Attempting to register new user: {}", details.getUserName());
 	            logger.info("Successfully registered user: {}", details.getUserName());

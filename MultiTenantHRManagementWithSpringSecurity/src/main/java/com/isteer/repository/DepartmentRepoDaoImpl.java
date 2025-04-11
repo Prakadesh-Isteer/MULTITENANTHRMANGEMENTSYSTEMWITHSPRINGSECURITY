@@ -73,14 +73,13 @@ public class DepartmentRepoDaoImpl implements DeapartmentRepoDao {
 
 		UUID uuid = UUID.randomUUID();
 		String departmentUuid = uuid.toString();
-		UUID uuid1 = UUID.randomUUID();
-		String hodId = uuid1.toString();
+	
 
-		String addDepartmentQuery = "INSERT INTO departments (department_uuid, department_head_uuid, tenant_id, department_name, contact_email, contact_phone, description) "
-				+ "VALUES (:departmentUuid, :headId, :tenantId, :departmentName, :email, :phone, :description)";
+		String addDepartmentQuery = "INSERT INTO departments (department_uuid, tenant_id, department_name, contact_email, contact_phone, description) "
+				+ "VALUES (:departmentUuid, :tenantId, :departmentName, :email, :phone, :description)";
 
 		SqlParameterSource params = new MapSqlParameterSource().addValue("departmentUuid", departmentUuid)
-				.addValue("headId", hodId).addValue("tenantId", department.getTenantUuid())
+				.addValue("tenantId", department.getTenantUuid())
 				.addValue("departmentName", department.getDepartmentName()).addValue("email", department.getEmail())
 				.addValue("phone", department.getPhoneNumber()).addValue("description", department.getDescription());
 		logger.info("Department added successfully with UUID: {}", departmentUuid);
@@ -92,7 +91,7 @@ public class DepartmentRepoDaoImpl implements DeapartmentRepoDao {
 	public Optional<Departments> findbyId(String departmentId) {
 		logger.info("Fetching department with ID: {}", departmentId);
 
-		String sql = "SELECT department_uuid, department_head_uuid, tenant_id, department_name, contact_email, contact_phone, description FROM departments where department_uuid = :departmentId";
+		String sql = "SELECT department_uuid, tenant_id, department_name, contact_email, contact_phone, description FROM departments where department_uuid = :departmentId";
 		SqlParameterSource param = new MapSqlParameterSource().addValue("departmentId", departmentId);
 		try {
 			Departments WrkDepartments = template.queryForObject(sql, param, new DepartmentRowMapper());
@@ -140,7 +139,7 @@ public class DepartmentRepoDaoImpl implements DeapartmentRepoDao {
 	@Override
 	public List<Departments> getAllDepartmentsByTenants(String tenantUuid) {
 		logger.info("Fetching all departments for tenant UUID: {}", tenantUuid);
-		String sql = "SELECT d.department_uuid, d.department_head_uuid, d.tenant_id, d.department_name, "
+		String sql = "SELECT d.department_uuid, d.tenant_id, d.department_name, "
 				+ "d.contact_email, d.contact_phone, d.description " + "FROM departments d "
 				+ "JOIN tenants t ON d.tenant_id = t.tenant_uuid "
 				+ "WHERE d.department_status = :status AND t.tenant_status = 1 " + "AND d.tenant_id = :tenantId";
@@ -156,7 +155,7 @@ public class DepartmentRepoDaoImpl implements DeapartmentRepoDao {
 	@Override
 	public List<Departments> getAllDepartments() {
 
-		String sql = "SELECT d.department_uuid, d.department_head_uuid, d.tenant_id, d.department_name, "
+		String sql = "SELECT d.department_uuid, d.tenant_id, d.department_name, "
 				+ "d.contact_email, d.contact_phone, d.description " + "FROM departments d "
 				+ "WHERE d.department_status = :status";
 

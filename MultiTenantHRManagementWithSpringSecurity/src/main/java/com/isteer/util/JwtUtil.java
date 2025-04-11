@@ -24,8 +24,12 @@ public class JwtUtil {
 	    
 	    // Generate a JWT token for a given user with username and role
 	    public String generateToken(String userName) {
-	    	System.out.println((new Date(System.currentTimeMillis())));
-	    	System.out.println(new Date(System.currentTimeMillis() + 60 * 60 * 1000));
+	    	logging.info("Generating JWT token for user: {}", userName);
+	    	Date issuedAt = new Date(System.currentTimeMillis());
+	        Date expiration = new Date(System.currentTimeMillis() + 60 * 60 * 1000); // 1 hour expiration
+	        logging.debug("Token issued at: {}", issuedAt);
+	        logging.debug("Token expiration: {}", expiration);
+	        logging.info("JWT token generated successfully for user: {}", userName);
 	        return Jwts.builder()
 	        		
 	        // Add a custom claim for role (you can add more claims here)
@@ -34,21 +38,28 @@ public class JwtUtil {
 	                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 1000)) // Expiry time (1 hour from issuance)
 	                .signWith(getKey())  // Sign the token with the secret key
 	                .compact();  // Return the JWT token
+	        
 	    }
 	    
 	    // Generate secret key from a string
 	    private SecretKey getKey() {    
+	        logging.debug("Generating secret key from the provided secret key string");
+
 	        byte[] byteArray = secretKey.getBytes();
 	        return Keys.hmacShaKeyFor(byteArray);  // Create HMAC SHA key from secret
 	    }
 	    
 	    // Extract the username (subject) from the token
 	    public String extractUserName(String token) throws ExpiredJwtException {
+	        logging.info("Extracting username from JWT token");
+
 	        return extractClaim(token, Claims::getSubject);
 	    }
 	    
 	    // Extract specific claims from the token (generic method)
 	    private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
+	        logging.debug("Extracting all claims from the JWT token");
+
 	        final Claims claims = extractAllClaims(token);
 	        return claimResolver.apply(claims);
 	    }
@@ -65,12 +76,18 @@ public class JwtUtil {
 	    public boolean validateToken(String token, UserDetails userDetails) {
 	        logging.info("Validating JWT token...");
 	        final String userName = extractUserName(token);
-	        System.out.println(userName);
+            logging.info("JWT token is valid for user: {}", userName);
+
 	        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
 	    }
 	    
 	    // Check if the token is expired
 	    private boolean isTokenExpired(String token) {
+	    	  Date expirationDate = extractExpiration(token);
+	          boolean isExpired = expirationDate.before(new Date());
+	          
+	          logging.debug("Token expiration date: {}", expirationDate);
+	          logging.debug("Is token expired: {}", isExpired);
 	        return extractExpiration(token).before(new Date());  // Check if the expiration date is in the past
 	    }
 

@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotBlank;
 public class Departments {
 	private String tenantUuid;
 	private String departmentUuid;
-	private String departmentHeadId;
 	@NotBlank(message = "DEPARTMENT NAME SHOULD NOT BE BLANK")
 	private String departmentName;
 	@NotBlank(message = "EMAIL FIELD SHOULD NOT BE EMPTY")
@@ -38,13 +37,6 @@ public class Departments {
 		this.departmentUuid = departmentUuid;
 	}
 
-	public String getDepartmentHeadId() {
-		return departmentHeadId;
-	}
-
-	public void setDepartmentHeadId(String departmentHeadId) {
-		this.departmentHeadId = departmentHeadId;
-	}
 
 	public String getDepartmentName() {
 		return departmentName;
@@ -78,15 +70,6 @@ public class Departments {
 		this.description = description;
 	}
 
-	public Departments(String departmentId, String departmentHeadId, String departmentName, String email,
-			String phoneNumber, String description) {
-		super();
-		this.departmentUuid = departmentId;
-		this.departmentHeadId = departmentHeadId;
-		this.departmentName = departmentName;
-		this.email = email;
-		this.phoneNumber = phoneNumber;
-		this.description = description;
-	}
+	
 
 }
